@@ -1,26 +1,26 @@
-<%- include('partials/header', { title: t('errors.serverError') + ' - Le Syndicat des Tox' }) %>
+<%- include('partials/header', { title: (typeof t === 'function' ? t('errors.serverError') : 'Erreur') + ' - Le Syndicat des Tox', language: typeof language !== 'undefined' ? language : 'fr' }) %>
 
 <div style="text-align: center; padding: 3rem 1rem;">
     <h1 style="font-size: 4rem; margin-bottom: 1rem;">
-        <% if (status === 404) { %>
+        <% if (typeof status !== 'undefined' && status === 404) { %>
             =
-        <% } else if (status === 403) { %>
-            =«
-        <% } else if (status === 401) { %>
+        <% } else if (typeof status !== 'undefined' && status === 403) { %>
+            =ï¿½
+        <% } else if (typeof status !== 'undefined' && status === 401) { %>
             =
         <% } else { %>
-             
+            ï¿½
         <% } %>
     </h1>
 
     <h2 style="margin-bottom: 1rem;">
-        <% if (status === 404) { %>
+        <% if (typeof status !== 'undefined' && status === 404) { %>
             <%= t('errors.notFound') %>
-        <% } else if (status === 403) { %>
+        <% } else if (typeof status !== 'undefined' && status === 403) { %>
             <%= t('errors.forbidden') %>
-        <% } else if (status === 401) { %>
+        <% } else if (typeof status !== 'undefined' && status === 401) { %>
             <%= t('errors.unauthorized') %>
-        <% } else if (status === 429) { %>
+        <% } else if (typeof status !== 'undefined' && status === 429) { %>
             <%= t('errors.rateLimited') %>
         <% } else { %>
             <%= t('errors.serverError') %>
@@ -39,12 +39,12 @@
 
     <div style="margin-top: 2rem;">
         <a href="/" class="btn"><%= t('errors.goHome') %></a>
-        <% if (status === 401) { %>
+        <% if (typeof status !== 'undefined' && status === 401) { %>
             <a href="/auth/login" class="btn btn-secondary" style="margin-left: 1rem;"><%= t('nav.login') %></a>
         <% } %>
     </div>
 
-    <% if (status >= 500) { %>
+    <% if (typeof status !== 'undefined' && status >= 500) { %>
         <div class="alert alert-info" style="max-width: 600px; margin: 2rem auto; text-align: left;">
             <strong><%= t('errors.contactSupport') %></strong>
             <p style="margin-top: 0.5rem;">
@@ -54,4 +54,4 @@
     <% } %>
 </div>
 
-<%- include('partials/footer') %>
+<%- include('partials/footer', { language: typeof language !== 'undefined' ? language : 'fr' }) %>

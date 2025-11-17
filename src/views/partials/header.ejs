@@ -342,6 +342,7 @@
             <h1>🤝 <%= t('app.name') %></h1>
             <nav>
                 <a href="/"><%= t('nav.home') %></a>
+                <a href="/threads"><%= t('forum.threads') %></a>
                 <a href="/about"><%= t('resources.title') %></a>
                 <% if (typeof user !== 'undefined' && user) { %>
                     <span style="color: #95a5a6;"><%= t('auth.welcomeBack', { pseudo: user.pseudo }) %></span>

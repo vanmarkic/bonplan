@@ -1,11 +1,11 @@
-<%- include('../partials/header', { title: 'Discussions - Le Syndicat des Tox' }) %>
+<%- include('../partials/header', { title: 'Discussions - Le Syndicat des Tox', language: typeof language !== 'undefined' ? language : 'fr' }) %>
 
 <h2><%= t('forum.threads') %></h2>
 
 <!-- Toolbar with new thread button and sorting options -->
 <div class="toolbar">
     <% if (typeof user !== 'undefined' && user) { %>
-        <a href="/forum/threads/new" class="btn">✍️ <%= t('forum.newThread') %></a>
+        <a href="/threads/new" class="btn">✍️ <%= t('forum.newThread') %></a>
     <% } else { %>
         <div>
             <a href="/auth/login" class="btn btn-secondary"><%= t('nav.login') %></a>
@@ -14,9 +14,9 @@
 
     <div class="sort-options">
         <span style="margin-right: 0.5rem; color: #7f8c8d;"><%= t('forum.sortBy') %>:</span>
-        <a href="/forum/threads?sort=recent" class="<%= sort === 'recent' ? 'active' : '' %>"><%= t('forum.sortActivity') %></a>
-        <a href="/forum/threads?sort=newest" class="<%= sort === 'newest' ? 'active' : '' %>"><%= t('forum.sortNewest') %></a>
-        <a href="/forum/threads?sort=replies" class="<%= sort === 'replies' ? 'active' : '' %>"><%= t('forum.sortReplies') %></a>
+        <a href="/threads?sort=recent" class="<%= filters.sort === 'recent' ? 'active' : '' %>"><%= t('forum.sortActivity') %></a>
+        <a href="/threads?sort=newest" class="<%= filters.sort === 'newest' ? 'active' : '' %>"><%= t('forum.sortNewest') %></a>
+        <a href="/threads?sort=replies" class="<%= filters.sort === 'replies' ? 'active' : '' %>"><%= t('forum.sortReplies') %></a>
     </div>
 </div>
 
@@ -60,24 +60,24 @@
 </div>
 
 <!-- Pagination -->
-<% if (totalPages && totalPages > 1) { %>
+<% if (pagination && pagination.total > 1) { %>
     <div class="pagination">
-        <% if (currentPage > 1) { %>
-            <a href="/forum/threads?page=1&sort=<%= sort %>">«</a>
-            <a href="/forum/threads?page=<%= currentPage - 1 %>&sort=<%= sort %>">‹ <%= t('pagination.previous') %></a>
+        <% if (pagination.hasPrev) { %>
+            <a href="/threads?page=1&sort=<%= filters.sort %>">«</a>
+            <a href="/threads?page=<%= pagination.current - 1 %>&sort=<%= filters.sort %>">‹ <%= t('pagination.previous') %></a>
         <% } %>
 
-        <% for(let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
-            <% if (i === currentPage) { %>
+        <% for(let i = Math.max(1, pagination.current - 2); i <= Math.min(pagination.total, pagination.current + 2); i++) { %>
+            <% if (i === pagination.current) { %>
                 <span class="current"><%= i %></span>
             <% } else { %>
-                <a href="/forum/threads?page=<%= i %>&sort=<%= sort %>"><%= i %></a>
+                <a href="/threads?page=<%= i %>&sort=<%= filters.sort %>"><%= i %></a>
             <% } %>
         <% } %>
 
-        <% if (currentPage < totalPages) { %>
-            <a href="/forum/threads?page=<%= currentPage + 1 %>&sort=<%= sort %>"><%= t('pagination.next') %> ›</a>
-            <a href="/forum/threads?page=<%= totalPages %>&sort=<%= sort %>">»</a>
+        <% if (pagination.hasNext) { %>
+            <a href="/threads?page=<%= pagination.current + 1 %>&sort=<%= filters.sort %>"><%= t('pagination.next') %> ›</a>
+            <a href="/threads?page=<%= pagination.total %>&sort=<%= filters.sort %>">»</a>
         <% } %>
     </div>
 <% } %>
@@ -86,4 +86,4 @@
     <strong><%= t('community.guidelines') %>:</strong> <%= t('community.safeSpace') %>. <%= t('community.respectful') %>. <%= t('community.harmReduction') %>.
 </div>
 
-<%- include('../partials/footer') %>
+<%- include('../partials/footer', { language: typeof language !== 'undefined' ? language : 'fr' }) %>

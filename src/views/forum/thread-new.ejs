@@ -2,7 +2,7 @@
 
 <!-- Breadcrumb navigation -->
 <div style="margin-bottom: 1.5rem;">
-    <a href="/forum/threads" style="color: #3498db; text-decoration: none;">← <%= t('actions.back') %> <%= t('forum.threads').toLowerCase() %></a>
+    <a href="/threads" style="color: #3498db; text-decoration: none;">← <%= t('actions.back') %> <%= t('forum.threads').toLowerCase() %></a>
 </div>
 
 <h2><%= t('threadNew.title') %></h2>
@@ -23,7 +23,8 @@
     </ul>
 </div>
 
-<form method="POST" action="/forum/threads/new" onsubmit="return validateForm()">
+<form method="POST" action="/threads/new" onsubmit="return validateForm()">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="form-group">
         <label for="title"><%= t('threadNew.threadTitle') %>: *</label>
         <input
@@ -43,17 +44,17 @@
     </div>
 
     <div class="form-group">
-        <label for="content"><%= t('threadNew.yourMessage') %>: *</label>
+        <label for="body"><%= t('threadNew.yourMessage') %>: *</label>
         <textarea
-            id="content"
-            name="content"
+            id="body"
+            name="body"
             required
             minlength="10"
             maxlength="10000"
             rows="12"
             placeholder="<%= t('threadNew.messagePlaceholder') %>"
             onkeyup="updateContentCount()"
-        ><%= typeof formData !== 'undefined' && formData.content ? formData.content : '' %></textarea>
+        ><%= typeof formData !== 'undefined' && formData.body ? formData.body : '' %></textarea>
         <div class="char-counter">
             <span id="content-count">0</span> / 10000 <%= t('threadNew.characters') %> (<%= t('threadNew.minimum') %> 10)
         </div>
@@ -86,7 +87,7 @@
         <button type="submit" class="btn">
             ✅ <%= t('threadNew.publishThread') %>
         </button>
-        <button type="button" onclick="if(confirm('<%= t('threadNew.abandonConfirm') %>')) { window.location.href='/forum/threads'; }" class="btn btn-secondary" style="margin-left: 1rem;">
+        <button type="button" onclick="if(confirm('<%= t('threadNew.abandonConfirm') %>')) { window.location.href='/threads'; }" class="btn btn-secondary" style="margin-left: 1rem;">
             ❌ <%= t('actions.cancel') %>
         </button>
     </div>
@@ -125,7 +126,7 @@ function updateTitleCount() {
 }
 
 function updateContentCount() {
-    const textarea = document.getElementById('content');
+    const textarea = document.getElementById('body');
     const count = textarea.value.length;
     const counter = document.getElementById('content-count');
     counter.textContent = count;
@@ -144,21 +145,21 @@ function updateContentCount() {
 
 function validateForm() {
     const title = document.getElementById('title').value;
-    const content = document.getElementById('content').value;
+    const body = document.getElementById('body').value;
 
     if (title.trim().length < 5) {
         alert('<%= t('threadNew.titleTooShort') %>');
         return false;
     }
 
-    if (content.trim().length < 10) {
+    if (body.trim().length < 10) {
         alert('<%= t('threadNew.messageTooShort') %>');
         return false;
     }
 
     // Confirmation for sensitive topics
     const sensitiveWords = ['suicide', 'overdose', 'OD', 'mort'];
-    const combinedText = (title + ' ' + content).toLowerCase();
+    const combinedText = (title + ' ' + body).toLowerCase();
 
     for (const word of sensitiveWords) {
         if (combinedText.includes(word.toLowerCase())) {

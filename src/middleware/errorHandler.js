@@ -36,8 +36,11 @@ module.exports = (err, req, res, next) => {
     res.status(statusCode).render('error', {
       title: 'Erreur',
       statusCode,
+      status: statusCode,
       message: response.error,
-      backUrl: req.headers.referer || '/'
+      backUrl: req.headers.referer || '/',
+      user: req.session.user || null,
+      language: req.session.language || (req.getLocale ? req.getLocale() : 'fr')
     });
   } else {
     res.status(statusCode).json(response);

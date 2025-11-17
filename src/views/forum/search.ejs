@@ -1,4 +1,4 @@
-<%- include('../partials/header', { title: t('search.pageTitle') }) %>
+<%- include('../partials/header', { title: t('search.pageTitle'), language: typeof language !== 'undefined' ? language : 'fr' }) %>
 
 <!-- Breadcrumb navigation -->
 <div style="margin-bottom: 1.5rem;">
@@ -39,10 +39,10 @@
             <div class="form-group">
                 <label for="search_in"><%= t('search.searchIn') %>:</label>
                 <select id="search_in" name="search_in">
-                    <option value="all" <%= searchIn === 'all' ? 'selected' : '' %>><%= t('search.all') %></option>
-                    <option value="title" <%= searchIn === 'title' ? 'selected' : '' %>><%= t('search.titlesOnly') %></option>
-                    <option value="content" <%= searchIn === 'content' ? 'selected' : '' %>><%= t('search.contentOnly') %></option>
-                    <option value="replies" <%= searchIn === 'replies' ? 'selected' : '' %>><%= t('search.repliesOnly') %></option>
+                    <option value="all" <%= (typeof searchIn !== 'undefined' && searchIn === 'all') ? 'selected' : '' %>><%= t('search.all') %></option>
+                    <option value="title" <%= (typeof searchIn !== 'undefined' && searchIn === 'title') ? 'selected' : '' %>><%= t('search.titlesOnly') %></option>
+                    <option value="content" <%= (typeof searchIn !== 'undefined' && searchIn === 'content') ? 'selected' : '' %>><%= t('search.contentOnly') %></option>
+                    <option value="replies" <%= (typeof searchIn !== 'undefined' && searchIn === 'replies') ? 'selected' : '' %>><%= t('search.repliesOnly') %></option>
                 </select>
             </div>
 
@@ -60,21 +60,21 @@
             <div class="form-group">
                 <label for="sort_by"><%= t('search.sortBy') %>:</label>
                 <select id="sort_by" name="sort_by">
-                    <option value="relevance" <%= sortBy === 'relevance' ? 'selected' : '' %>><%= t('search.relevance') %></option>
-                    <option value="newest" <%= sortBy === 'newest' ? 'selected' : '' %>><%= t('search.newest') %></option>
-                    <option value="oldest" <%= sortBy === 'oldest' ? 'selected' : '' %>><%= t('search.oldest') %></option>
-                    <option value="replies" <%= sortBy === 'replies' ? 'selected' : '' %>><%= t('search.mostReplies') %></option>
+                    <option value="relevance" <%= (typeof sortBy !== 'undefined' && sortBy === 'relevance') ? 'selected' : '' %>><%= t('search.relevance') %></option>
+                    <option value="newest" <%= (typeof sortBy !== 'undefined' && sortBy === 'newest') ? 'selected' : '' %>><%= t('search.newest') %></option>
+                    <option value="oldest" <%= (typeof sortBy !== 'undefined' && sortBy === 'oldest') ? 'selected' : '' %>><%= t('search.oldest') %></option>
+                    <option value="replies" <%= (typeof sortBy !== 'undefined' && sortBy === 'replies') ? 'selected' : '' %>><%= t('search.mostReplies') %></option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="date_range"><%= t('search.period') %>:</label>
                 <select id="date_range" name="date_range">
-                    <option value="all" <%= dateRange === 'all' ? 'selected' : '' %>><%= t('search.allDates') %></option>
-                    <option value="today" <%= dateRange === 'today' ? 'selected' : '' %>><%= t('search.today') %></option>
-                    <option value="week" <%= dateRange === 'week' ? 'selected' : '' %>><%= t('search.thisWeek') %></option>
-                    <option value="month" <%= dateRange === 'month' ? 'selected' : '' %>><%= t('search.thisMonth') %></option>
-                    <option value="year" <%= dateRange === 'year' ? 'selected' : '' %>><%= t('search.thisYear') %></option>
+                    <option value="all" <%= (typeof dateRange !== 'undefined' && dateRange === 'all') ? 'selected' : '' %>><%= t('search.allDates') %></option>
+                    <option value="today" <%= (typeof dateRange !== 'undefined' && dateRange === 'today') ? 'selected' : '' %>><%= t('search.today') %></option>
+                    <option value="week" <%= (typeof dateRange !== 'undefined' && dateRange === 'week') ? 'selected' : '' %>><%= t('search.thisWeek') %></option>
+                    <option value="month" <%= (typeof dateRange !== 'undefined' && dateRange === 'month') ? 'selected' : '' %>><%= t('search.thisMonth') %></option>
+                    <option value="year" <%= (typeof dateRange !== 'undefined' && dateRange === 'year') ? 'selected' : '' %>><%= t('search.thisYear') %></option>
                 </select>
             </div>
         </div>
@@ -201,4 +201,4 @@ function getLanguageName(code) {
     <strong>💡 <%= t('search.tip') %>:</strong> <%= t('search.tipText') %>
 </div>
 
-<%- include('../partials/footer') %>
+<%- include('../partials/footer', { language: typeof language !== 'undefined' ? language : 'fr' }) %>

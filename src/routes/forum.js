@@ -89,6 +89,11 @@ router.get('/', rateLimiters.general, async (req, res) => {
       language
     });
 
+    // Map author_pseudo to author for template compatibility
+    threads.forEach(thread => {
+      thread.author = thread.author_pseudo;
+    });
+
     // Get total count for pagination
     const totalThreads = await Thread.count({ language });
     const totalPages = Math.ceil(totalThreads / limit);
@@ -143,6 +148,11 @@ router.get('/threads', rateLimiters.general, async (req, res) => {
       language
     });
 
+    // Map author_pseudo to author for template compatibility
+    threads.forEach(thread => {
+      thread.author = thread.author_pseudo;
+    });
+
     const totalThreads = await Thread.count({ language });
     const totalPages = Math.ceil(totalThreads / limit);
 
@@ -174,6 +184,26 @@ router.get('/threads', rateLimiters.general, async (req, res) => {
       language: req.session.language || 'fr'
     });
   }
+});
+
+// ============================================================================
+// PROTECTED ROUTES (Authentication Required)
+// ============================================================================
+
+/**
+ * GET /threads/new
+ * New thread form
+ * NOTE: This MUST come BEFORE /threads/:id to avoid matching "new" as an ID
+ */
+router.get('/threads/new', requireAuth, rateLimiters.general, (req, res) => {
+  res.render('forum/thread-new', {
+    title: 'Nouveau fil - Le Syndicat des Tox',
+    error: null,
+    formData: {},
+    csrfToken: res.locals.csrfToken,
+    user: req.session.user,
+    language: req.session.language || 'fr'
+  });
 });
 
 /**
@@ -245,14 +275,17 @@ router.get('/threads/:id', [
     const canModerate = res.locals.isModerator;
 
     // SECURITY: Sanitize all user-generated content to prevent XSS
-    thread.content = sanitizeContent(thread.content, true);
+    // Map body to content for template compatibility
+    thread.content = sanitizeContent(thread.body, true);
+    thread.author = thread.author_pseudo;
 
     // Sanitize all reply content
     replies.forEach((reply) => {
-      reply.content = sanitizeContent(reply.content, true);
+      reply.content = sanitizeContent(reply.body, true);
+      reply.author = reply.author_pseudo;
     });
 
-    res.render('forum/thread', {
+    res.render('forum/thread-detail', {
       title: `${thread.title} - Le Syndicat des Tox`,
       thread,
       replies,
@@ -372,24 +405,6 @@ router.post('/search', [
   }
 });
 
-// ============================================================================
-// PROTECTED ROUTES (Authentication Required)
-// ============================================================================
-
-/**
- * GET /threads/new
- * New thread form
- */
-router.get('/threads/new', requireAuth, rateLimiters.general, (req, res) => {
-  res.render('forum/thread-new', {
-    title: 'Nouveau fil - Le Syndicat des Tox',
-    error: null,
-    formData: {},
-    user: req.session.user,
-    language: req.session.language || 'fr'
-  });
-});
-
 /**
  * POST /threads/new
  * Create thread
@@ -412,6 +427,7 @@ router.post('/threads/new', [
         title: 'Nouveau fil - Le Syndicat des Tox',
         error: validationError,
         formData: req.body,
+        csrfToken: res.locals.csrfToken,
         user: req.session.user,
         language: req.session.language || 'fr'
       });
@@ -440,6 +456,7 @@ router.post('/threads/new', [
       title: 'Nouveau fil - Le Syndicat des Tox',
       error: 'Erreur lors de la création du fil',
       formData: req.body,
+      csrfToken: res.locals.csrfToken,
       user: req.session.user,
       language: req.session.language || 'fr'
     });

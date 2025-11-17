@@ -10,6 +10,7 @@
 
 <div style="max-width: 500px;">
     <form method="POST" action="/auth/login">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="form-group">
             <label for="pseudo"><%= t('auth.pseudo') %></label>
             <input
