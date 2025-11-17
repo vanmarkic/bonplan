@@ -308,19 +308,23 @@ class Reply {
    * @param {Object} options - Query options
    * @param {number} options.limit - Number of replies (default: 20)
    * @param {number} options.offset - Number to skip (default: 0)
+   * @param {boolean} options.includeBody - Include reply body (default: true)
    * @returns {Promise<Array>} Array of replies
    */
   static async findByAuthor(authorPseudo, options = {}) {
     const {
       limit = 20,
-      offset = 0
+      offset = 0,
+      includeBody = true
     } = options;
+
+    const bodyField = includeBody ? 'r.body,' : '';
 
     const query = `
       SELECT
         r.id,
         r.thread_id,
-        r.body,
+        ${bodyField}
         r.created_at,
         r.edited_at,
         r.is_deleted,

@@ -15,6 +15,9 @@ const User = require('../models/User');
 // Services
 const ReportService = require('../services/reportService');
 
+// Database
+const db = require('../utils/database');
+
 // Middleware
 const { requireAuth, checkAuth } = require('../middleware/requireAuth');
 const { requireModerator, checkModerator } = require('../middleware/requireModerator');
@@ -1295,6 +1298,311 @@ router.get('/privacy', rateLimiters.general, (req, res) => {
     user: req.session.user || null,
     language: req.session.language || 'fr'
   });
+});
+
+/**
+ * GET /forum/resources
+ * Belgian crisis resources and help services
+ */
+router.get('/forum/resources', rateLimiters.general, (req, res) => {
+  res.render('forum/resources', {
+    title: 'Ressources d\'aide - Le Syndicat des Tox',
+    user: req.session.user || null,
+    language: req.session.language || 'fr'
+  });
+});
+
+// ============================================================================
+// USER SETTINGS AND ACCOUNT MANAGEMENT
+// ============================================================================
+
+/**
+ * GET /forum/settings
+ * User settings page
+ */
+router.get('/forum/settings', requireAuth, rateLimiters.general, async (req, res) => {
+  try {
+    // Get user stats
+    const stats = await User.getStats(req.session.user.pseudo);
+
+    // Get full user data
+    const user = await User.findByPseudo(req.session.user.pseudo);
+
+    res.render('forum/settings', {
+      title: 'Paramètres - Le Syndicat des Tox',
+      user: {
+        pseudo: user.pseudo,
+        createdAt: user.created_at,
+        preferredLanguage: user.preferred_language,
+        isModerator: user.is_moderator
+      },
+      stats: {
+        threadCount: stats ? stats.post_count : 0,
+        replyCount: stats ? stats.reply_count : 0
+      },
+      error: null,
+      success: getFlashMessage(req)?.message || null,
+      csrfToken: req.csrfToken,
+      language: req.session.language || 'fr'
+    });
+  } catch (error) {
+    logger.error('Error loading settings page', error);
+    res.status(500).render('error', {
+      title: 'Erreur',
+      statusCode: 500,
+      message: 'Erreur lors du chargement des paramètres',
+      backUrl: '/',
+      user: req.session.user,
+      language: req.session.language || 'fr'
+    });
+  }
+});
+
+/**
+ * POST /forum/settings/language
+ * Update user's preferred language
+ */
+router.post('/forum/settings/language', [
+  requireAuth,
+  rateLimiters.general,
+  body('language').isIn(['fr', 'en', 'nl', 'de']).withMessage('Langue invalide')
+], async (req, res) => {
+  try {
+    const validationError = handleValidationErrors(req, res);
+    if (validationError) {
+      setFlashMessage(req, 'error', validationError);
+      return res.redirect('/forum/settings');
+    }
+
+    const { language } = req.body;
+
+    // Update language in database
+    const query = 'UPDATE users SET preferred_language = ? WHERE pseudo = ?';
+    await db.execute(query, [language, req.session.user.pseudo]);
+
+    // Update session
+    req.session.user.preferredLanguage = language;
+    req.session.language = language;
+
+    logger.info('User language updated', {
+      pseudo: req.session.user.pseudo,
+      language
+    });
+
+    setFlashMessage(req, 'success', 'Langue mise à jour avec succès');
+    res.redirect('/forum/settings');
+  } catch (error) {
+    logger.error('Error updating language', error);
+    setFlashMessage(req, 'error', 'Erreur lors de la mise à jour de la langue');
+    res.redirect('/forum/settings');
+  }
+});
+
+/**
+ * GET /forum/export
+ * Display data export page (GDPR right to data portability)
+ */
+router.get('/forum/export', requireAuth, rateLimiters.general, (req, res) => {
+  res.render('forum/export', {
+    title: 'Exporter mes données - Le Syndicat des Tox',
+    error: null,
+    success: null,
+    csrfToken: req.csrfToken,
+    user: req.session.user,
+    language: req.session.language || 'fr'
+  });
+});
+
+/**
+ * POST /forum/export
+ * Generate and download user data export (GDPR)
+ */
+router.post('/forum/export', [
+  requireAuth,
+  rateLimiters.general,
+  body('confirm').equals('on').withMessage('Vous devez confirmer l\'export')
+], async (req, res) => {
+  try {
+    const validationError = handleValidationErrors(req, res);
+    if (validationError) {
+      return res.render('forum/export', {
+        title: 'Exporter mes données - Le Syndicat des Tox',
+        error: validationError,
+        success: null,
+        csrfToken: req.csrfToken,
+        user: req.session.user,
+        language: req.session.language || 'fr'
+      });
+    }
+
+    const pseudo = req.session.user.pseudo;
+
+    // Get user data
+    const user = await User.findByPseudo(pseudo);
+
+    // Get all user's threads
+    const threadsQuery = `
+      SELECT id, title, body, created_at, updated_at, edited_at,
+             reply_count, view_count, language, is_pinned, is_locked
+      FROM threads
+      WHERE author_pseudo = ? AND is_deleted = 0
+      ORDER BY created_at DESC
+    `;
+    const [threads] = await db.execute(threadsQuery, [pseudo]);
+
+    // Get all user's replies
+    const repliesQuery = `
+      SELECT r.id, r.thread_id, r.body, r.created_at, r.updated_at, r.edited_at,
+             t.title as thread_title
+      FROM replies r
+      JOIN threads t ON r.thread_id = t.id
+      WHERE r.author_pseudo = ? AND r.is_deleted = 0
+      ORDER BY r.created_at DESC
+    `;
+    const [replies] = await db.execute(repliesQuery, [pseudo]);
+
+    // Prepare export data
+    const exportData = {
+      user: {
+        pseudo: user.pseudo,
+        createdAt: user.created_at,
+        preferredLanguage: user.preferred_language,
+        isModerator: user.is_moderator,
+        postCount: user.post_count,
+        replyCount: user.reply_count
+      },
+      threads: threads.map(t => ({
+        id: t.id,
+        title: t.title,
+        body: t.body,
+        createdAt: t.created_at,
+        updatedAt: t.updated_at,
+        editedAt: t.edited_at,
+        replyCount: t.reply_count,
+        viewCount: t.view_count,
+        language: t.language,
+        isPinned: t.is_pinned,
+        isLocked: t.is_locked
+      })),
+      replies: replies.map(r => ({
+        id: r.id,
+        threadId: r.thread_id,
+        threadTitle: r.thread_title,
+        body: r.body,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+        editedAt: r.edited_at
+      })),
+      exportDate: new Date().toISOString(),
+      exportVersion: '1.0'
+    };
+
+    logger.audit('User data exported', { pseudo });
+
+    // Set headers for download
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="syndicat-export-${pseudo}-${Date.now()}.json"`);
+
+    // Send JSON file
+    res.send(JSON.stringify(exportData, null, 2));
+  } catch (error) {
+    logger.error('Error exporting user data', error);
+    res.render('forum/export', {
+      title: 'Exporter mes données - Le Syndicat des Tox',
+      error: 'Erreur lors de l\'export des données',
+      success: null,
+      csrfToken: req.csrfToken,
+      user: req.session.user,
+      language: req.session.language || 'fr'
+    });
+  }
+});
+
+/**
+ * GET /forum/delete-account
+ * Display account deletion page (GDPR right to erasure)
+ */
+router.get('/forum/delete-account', requireAuth, rateLimiters.general, (req, res) => {
+  res.render('forum/delete-account', {
+    title: 'Supprimer mon compte - Le Syndicat des Tox',
+    error: null,
+    csrfToken: req.csrfToken,
+    user: req.session.user,
+    language: req.session.language || 'fr'
+  });
+});
+
+/**
+ * POST /forum/delete-account
+ * Permanently delete user account and all data (GDPR)
+ */
+router.post('/forum/delete-account', [
+  requireAuth,
+  rateLimiters.general,
+  body('confirmation').equals('DELETE MY ACCOUNT')
+    .withMessage('La phrase de confirmation doit être exactement: DELETE MY ACCOUNT'),
+  body('pin').matches(/^[0-9]{4}$/).withMessage('Code PIN invalide'),
+  body('understand').equals('on').withMessage('Vous devez confirmer avoir compris')
+], async (req, res) => {
+  try {
+    const validationError = handleValidationErrors(req, res);
+    if (validationError) {
+      return res.render('forum/delete-account', {
+        title: 'Supprimer mon compte - Le Syndicat des Tox',
+        error: validationError,
+        csrfToken: req.csrfToken,
+        user: req.session.user,
+        language: req.session.language || 'fr'
+      });
+    }
+
+    const { pin } = req.body;
+    const pseudo = req.session.user.pseudo;
+
+    // Verify PIN
+    const user = await User.findByPseudo(pseudo);
+    const AuthService = require('../services/authService');
+    const validPin = await AuthService.verifyPin(pin, user.pin_hash);
+
+    if (!validPin) {
+      return res.render('forum/delete-account', {
+        title: 'Supprimer mon compte - Le Syndicat des Tox',
+        error: 'Code PIN incorrect',
+        csrfToken: req.csrfToken,
+        user: req.session.user,
+        language: req.session.language || 'fr'
+      });
+    }
+
+    // Delete account (cascades to threads and replies due to foreign keys)
+    await User.deleteAccount(pseudo);
+
+    logger.audit('User account deleted', { pseudo });
+    logger.security('Account deletion completed', { pseudo });
+
+    // Destroy session
+    req.session.destroy((err) => {
+      if (err) {
+        logger.error('Session destruction error during account deletion', err);
+      }
+    });
+
+    // Redirect to goodbye page or home with message
+    res.render('forum/account-deleted', {
+      title: 'Compte supprimé - Le Syndicat des Tox',
+      user: null,
+      language: 'fr'
+    });
+  } catch (error) {
+    logger.error('Error deleting account', error);
+    res.render('forum/delete-account', {
+      title: 'Supprimer mon compte - Le Syndicat des Tox',
+      error: 'Erreur lors de la suppression du compte',
+      csrfToken: req.csrfToken,
+      user: req.session.user,
+      language: req.session.language || 'fr'
+    });
+  }
 });
 
 module.exports = router;

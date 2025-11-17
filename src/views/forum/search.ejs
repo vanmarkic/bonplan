@@ -1,80 +1,80 @@
-<%- include('../partials/header', { title: 'Recherche - Le Syndicat des Tox' }) %>
+<%- include('../partials/header', { title: t('search.pageTitle') }) %>
 
 <!-- Breadcrumb navigation -->
 <div style="margin-bottom: 1.5rem;">
-    <a href="/forum/threads" style="color: #3498db; text-decoration: none;">← Retour aux discussions</a>
+    <a href="/forum/threads" style="color: #3498db; text-decoration: none;">← <%= t('actions.back') %> <%= t('forum.threads').toLowerCase() %></a>
 </div>
 
-<h2>🔍 Rechercher dans les discussions</h2>
+<h2>🔍 <%= t('search.title') %></h2>
 
 <!-- Search form -->
 <form method="GET" action="/forum/search" style="margin-bottom: 2rem;">
     <div class="form-group">
-        <label for="q">Rechercher:</label>
+        <label for="q"><%= t('search.searchLabel') %>:</label>
         <div style="display: flex; gap: 0.5rem;">
             <input
                 type="text"
                 id="q"
                 name="q"
                 value="<%= typeof query !== 'undefined' ? query : '' %>"
-                placeholder="Entrez vos mots-clés..."
+                placeholder="<%= t('search.placeholder') %>"
                 minlength="2"
                 maxlength="100"
                 required
                 style="flex: 1;"
             >
             <button type="submit" class="btn">
-                🔍 Rechercher
+                🔍 <%= t('search.searchButton') %>
             </button>
         </div>
         <div class="text-small" style="margin-top: 0.5rem;">
-            Recherchez par titre, contenu ou auteur (minimum 2 caractères)
+            <%= t('search.helpText') %>
         </div>
     </div>
 
     <!-- Advanced search options -->
     <details style="margin-top: 1rem;">
-        <summary style="cursor: pointer; color: #3498db;">Options avancées</summary>
+        <summary style="cursor: pointer; color: #3498db;"><%= t('search.advancedOptions') %></summary>
         <div style="margin-top: 1rem; padding: 1rem; background: #f9f9f9; border-radius: 4px;">
             <div class="form-group">
-                <label for="search_in">Rechercher dans:</label>
+                <label for="search_in"><%= t('search.searchIn') %>:</label>
                 <select id="search_in" name="search_in">
-                    <option value="all" <%= searchIn === 'all' ? 'selected' : '' %>>Tout</option>
-                    <option value="title" <%= searchIn === 'title' ? 'selected' : '' %>>Titres uniquement</option>
-                    <option value="content" <%= searchIn === 'content' ? 'selected' : '' %>>Contenu uniquement</option>
-                    <option value="replies" <%= searchIn === 'replies' ? 'selected' : '' %>>Réponses uniquement</option>
+                    <option value="all" <%= searchIn === 'all' ? 'selected' : '' %>><%= t('search.all') %></option>
+                    <option value="title" <%= searchIn === 'title' ? 'selected' : '' %>><%= t('search.titlesOnly') %></option>
+                    <option value="content" <%= searchIn === 'content' ? 'selected' : '' %>><%= t('search.contentOnly') %></option>
+                    <option value="replies" <%= searchIn === 'replies' ? 'selected' : '' %>><%= t('search.repliesOnly') %></option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="language">Langue:</label>
+                <label for="language"><%= t('search.language') %>:</label>
                 <select id="language" name="language">
-                    <option value="all" <%= (!language || language === 'all') ? 'selected' : '' %>>Toutes les langues</option>
-                    <option value="fr" <%= language === 'fr' ? 'selected' : '' %>>Français</option>
-                    <option value="nl" <%= language === 'nl' ? 'selected' : '' %>>Nederlands</option>
-                    <option value="en" <%= language === 'en' ? 'selected' : '' %>>English</option>
-                    <option value="de" <%= language === 'de' ? 'selected' : '' %>>Deutsch</option>
+                    <option value="all" <%= (!language || language === 'all') ? 'selected' : '' %>><%= t('search.allLanguages') %></option>
+                    <option value="fr" <%= language === 'fr' ? 'selected' : '' %>><%= t('languages.fr') %></option>
+                    <option value="nl" <%= language === 'nl' ? 'selected' : '' %>><%= t('languages.nl') %></option>
+                    <option value="en" <%= language === 'en' ? 'selected' : '' %>><%= t('languages.en') %></option>
+                    <option value="de" <%= language === 'de' ? 'selected' : '' %>><%= t('languages.de') %></option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="sort_by">Trier par:</label>
+                <label for="sort_by"><%= t('search.sortBy') %>:</label>
                 <select id="sort_by" name="sort_by">
-                    <option value="relevance" <%= sortBy === 'relevance' ? 'selected' : '' %>>Pertinence</option>
-                    <option value="newest" <%= sortBy === 'newest' ? 'selected' : '' %>>Plus récent</option>
-                    <option value="oldest" <%= sortBy === 'oldest' ? 'selected' : '' %>>Plus ancien</option>
-                    <option value="replies" <%= sortBy === 'replies' ? 'selected' : '' %>>Plus de réponses</option>
+                    <option value="relevance" <%= sortBy === 'relevance' ? 'selected' : '' %>><%= t('search.relevance') %></option>
+                    <option value="newest" <%= sortBy === 'newest' ? 'selected' : '' %>><%= t('search.newest') %></option>
+                    <option value="oldest" <%= sortBy === 'oldest' ? 'selected' : '' %>><%= t('search.oldest') %></option>
+                    <option value="replies" <%= sortBy === 'replies' ? 'selected' : '' %>><%= t('search.mostReplies') %></option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="date_range">Période:</label>
+                <label for="date_range"><%= t('search.period') %>:</label>
                 <select id="date_range" name="date_range">
-                    <option value="all" <%= dateRange === 'all' ? 'selected' : '' %>>Toutes les dates</option>
-                    <option value="today" <%= dateRange === 'today' ? 'selected' : '' %>>Aujourd'hui</option>
-                    <option value="week" <%= dateRange === 'week' ? 'selected' : '' %>>Cette semaine</option>
-                    <option value="month" <%= dateRange === 'month' ? 'selected' : '' %>>Ce mois</option>
-                    <option value="year" <%= dateRange === 'year' ? 'selected' : '' %>>Cette année</option>
+                    <option value="all" <%= dateRange === 'all' ? 'selected' : '' %>><%= t('search.allDates') %></option>
+                    <option value="today" <%= dateRange === 'today' ? 'selected' : '' %>><%= t('search.today') %></option>
+                    <option value="week" <%= dateRange === 'week' ? 'selected' : '' %>><%= t('search.thisWeek') %></option>
+                    <option value="month" <%= dateRange === 'month' ? 'selected' : '' %>><%= t('search.thisMonth') %></option>
+                    <option value="year" <%= dateRange === 'year' ? 'selected' : '' %>><%= t('search.thisYear') %></option>
                 </select>
             </div>
         </div>
@@ -85,7 +85,7 @@
 <% if (typeof query !== 'undefined' && query) { %>
     <% if (results && results.length > 0) { %>
         <div style="margin-bottom: 1.5rem;">
-            <p><strong><%= totalResults %></strong> résultat<%= totalResults !== 1 ? 's' : '' %> pour "<%= query %>"</p>
+            <p><strong><%= totalResults %></strong> <%= totalResults !== 1 ? t('search.results') : t('search.result') %> <%= t('search.for') %> "<%= query %>"</p>
         </div>
 
         <div class="thread-list">
@@ -101,13 +101,13 @@
                     </div>
 
                     <div class="thread-meta">
-                        <span>Par <%= result.author || '[supprimé]' %></span>
+                        <span><%= t('search.by') %> <%= result.author || t('forum.deleted') %></span>
                         <% if (result.isModerator) { %>
-                            <span class="moderator-badge">🛡️ Modérateur</span>
+                            <span class="moderator-badge">🛡️ <%= t('moderation.moderator') %></span>
                         <% } %>
                         <span> • <%= result.createdAt %></span>
                         <% if (result.type === 'thread') { %>
-                            <span> • <%= result.replyCount || 0 %> réponse<%= result.replyCount !== 1 ? 's' : '' %></span>
+                            <span> • <%= result.replyCount || 0 %> <%= result.replyCount !== 1 ? t('forum.replies') : t('forum.reply') %></span>
                         <% } %>
                         <% if (result.language && result.language !== 'fr') { %>
                             <span> • <%= getLanguageName(result.language) %></span>
@@ -127,8 +127,8 @@
                 <% const queryParams = `q=${encodeURIComponent(query)}&search_in=${searchIn}&language=${language}&sort_by=${sortBy}&date_range=${dateRange}`; %>
 
                 <% if (currentPage > 1) { %>
-                    <a href="/forum/search?<%= queryParams %>&page=1">« Début</a>
-                    <a href="/forum/search?<%= queryParams %>&page=<%= currentPage - 1 %>">‹ Précédent</a>
+                    <a href="/forum/search?<%= queryParams %>&page=1">« <%= t('search.first') %></a>
+                    <a href="/forum/search?<%= queryParams %>&page=<%= currentPage - 1 %>">‹ <%= t('pagination.previous') %></a>
                 <% } %>
 
                 <% for(let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
@@ -140,8 +140,8 @@
                 <% } %>
 
                 <% if (currentPage < totalPages) { %>
-                    <a href="/forum/search?<%= queryParams %>&page=<%= currentPage + 1 %>">Suivant ›</a>
-                    <a href="/forum/search?<%= queryParams %>&page=<%= totalPages %>">Fin »</a>
+                    <a href="/forum/search?<%= queryParams %>&page=<%= currentPage + 1 %>"><%= t('pagination.next') %> ›</a>
+                    <a href="/forum/search?<%= queryParams %>&page=<%= totalPages %>"><%= t('search.last') %> »</a>
                 <% } %>
             </div>
         <% } %>
@@ -149,15 +149,15 @@
     <% } else { %>
         <div class="no-results">
             <p style="font-size: 3rem; margin-bottom: 1rem;">🔍</p>
-            <h3>Aucun résultat trouvé</h3>
-            <p>Aucune discussion ne correspond à votre recherche "<strong><%= query %></strong>"</p>
+            <h3><%= t('search.noResults') %></h3>
+            <p><%= t('search.noResultsFor') %> "<strong><%= query %></strong>"</p>
             <div style="margin-top: 1.5rem;">
-                <p><strong>Suggestions:</strong></p>
+                <p><strong><%= t('search.suggestions') %>:</strong></p>
                 <ul style="text-align: left; display: inline-block; margin-top: 0.5rem;">
-                    <li>Vérifiez l'orthographe de vos mots-clés</li>
-                    <li>Essayez des mots-clés plus généraux</li>
-                    <li>Essayez avec moins de mots</li>
-                    <li>Changez les options de recherche avancée</li>
+                    <li><%= t('search.suggestion1') %></li>
+                    <li><%= t('search.suggestion2') %></li>
+                    <li><%= t('search.suggestion3') %></li>
+                    <li><%= t('search.suggestion4') %></li>
                 </ul>
             </div>
         </div>
@@ -166,13 +166,13 @@
     <!-- No search performed yet -->
     <div style="text-align: center; padding: 2rem;">
         <p style="font-size: 3rem; margin-bottom: 1rem;">🔍</p>
-        <p>Entrez vos mots-clés pour rechercher dans les discussions</p>
+        <p><%= t('search.emptyState') %></p>
     </div>
 
     <!-- Popular search terms -->
     <% if (typeof popularSearches !== 'undefined' && popularSearches && popularSearches.length > 0) { %>
         <div style="margin-top: 2rem;">
-            <h3>Recherches populaires:</h3>
+            <h3><%= t('search.popularSearches') %>:</h3>
             <div style="margin-top: 1rem;">
                 <% popularSearches.forEach(term => { %>
                     <a href="/forum/search?q=<%= encodeURIComponent(term) %>" class="btn btn-secondary" style="margin: 0.25rem;">
@@ -212,7 +212,7 @@ function getLanguageName(code) {
 %>
 
 <div class="alert alert-info" style="margin-top: 2rem;">
-    <strong>💡 Astuce:</strong> Utilisez les guillemets pour rechercher une expression exacte, par exemple: "réduction des risques"
+    <strong>💡 <%= t('search.tip') %>:</strong> <%= t('search.tipText') %>
 </div>
 
 <%- include('../partials/footer') %>

@@ -1,117 +1,116 @@
 <%- include('../partials/header') %>
 
-<h2>Politique de confidentialité</h2>
+<h2><%= t('privacyPolicy.title') %></h2>
 
 <div style="max-width: 800px;">
-    <p><em>Dernière mise à jour : <%= new Date().toLocaleDateString('fr-FR') %></em></p>
+    <p><em><%= t('privacyPolicy.lastUpdate') %>: <%= new Date().toLocaleDateString(locale || 'fr-FR') %></em></p>
 
-    <h3>Notre engagement</h3>
-    <p><strong>Le Syndicat des Tox ne collecte AUCUNE donnée personnelle identifiable.</strong></p>
-    <p>Nous pratiquons la minimisation des données par principe, pas par compromis.</p>
+    <h3><%= t('privacyPolicy.commitment') %></h3>
+    <p><strong><%= t('privacyPolicy.commitmentText') %></strong></p>
+    <p><%= t('privacyPolicy.minimization') %></p>
 
-    <h3>Données collectées</h3>
+    <h3><%= t('privacyPolicy.dataCollected') %></h3>
     <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
         <tr style="background: #ecf0f1;">
-            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ccc;">Donnée</th>
-            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ccc;">Collectée ?</th>
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ccc;"><%= t('privacyPolicy.dataType') %></th>
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ccc;"><%= t('privacyPolicy.collected') %></th>
         </tr>
         <tr>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;">Adresse IP</td>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ NON</strong> (anonymisée au niveau du proxy)</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><%= t('privacyPolicy.ipAddress') %></td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ <%= t('privacyPolicy.no') %></strong> (<%= t('privacyPolicy.ipAnonymized') %>)</td>
         </tr>
         <tr>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;">Email</td>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ NON</strong> (jamais demandé)</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><%= t('privacyPolicy.email') %></td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ <%= t('privacyPolicy.no') %></strong> (<%= t('privacyPolicy.neverAsked') %>)</td>
         </tr>
         <tr>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;">Numéro de téléphone</td>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ NON</strong> (jamais demandé)</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><%= t('privacyPolicy.phone') %></td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ <%= t('privacyPolicy.no') %></strong> (<%= t('privacyPolicy.neverAsked') %>)</td>
         </tr>
         <tr>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;">Nom réel</td>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ NON</strong> (jamais demandé)</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><%= t('privacyPolicy.realName') %></td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ <%= t('privacyPolicy.no') %></strong> (<%= t('privacyPolicy.neverAsked') %>)</td>
         </tr>
         <tr>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;">Localisation</td>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ NON</strong> (aucun GPS, aucune géolocalisation)</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><%= t('privacyPolicy.location') %></td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ <%= t('privacyPolicy.no') %></strong> (<%= t('privacyPolicy.noGeolocation') %>)</td>
         </tr>
         <tr>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;">Pseudo</td>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>✅ OUI</strong> (choisi par vous, anonyme)</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><%= t('privacyPolicy.pseudo') %></td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>✅ <%= t('privacyPolicy.yes') %></strong> (<%= t('privacyPolicy.pseudoNote') %>)</td>
         </tr>
         <tr>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;">Code PIN</td>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>✅ OUI</strong> (chiffré avec Argon2id, impossible à déchiffrer)</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><%= t('privacyPolicy.pin') %></td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>✅ <%= t('privacyPolicy.yes') %></strong> (<%= t('privacyPolicy.pinEncrypted') %>)</td>
         </tr>
         <tr>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;">Messages</td>
-            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>✅ OUI</strong> (publics, associés à votre pseudo)</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><%= t('privacyPolicy.messages') %></td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>✅ <%= t('privacyPolicy.yes') %></strong> (<%= t('privacyPolicy.messagesNote') %>)</td>
         </tr>
     </table>
 
-    <h3>Cookies</h3>
-    <p>Nous utilisons UN SEUL cookie essentiel :</p>
+    <h3><%= t('privacyPolicy.cookies') %></h3>
+    <p><%= t('privacyPolicy.cookiesIntro') %></p>
     <ul>
-        <li><strong>Cookie de session (sid)</strong> : Nécessaire pour maintenir votre connexion. Expire après 7 jours ou à la déconnexion.</li>
+        <li><strong><%= t('privacyPolicy.sessionCookie') %></strong> : <%= t('privacyPolicy.sessionCookieNote') %></li>
     </ul>
-    <p>Pas de cookies de tracking, pas de cookies publicitaires, pas de cookies tiers.</p>
+    <p><%= t('privacyPolicy.noCookies') %></p>
 
-    <h3>Analytics et tracking</h3>
-    <p><strong>Aucun.</strong></p>
-    <p>Pas de Google Analytics, pas de Facebook Pixel, pas de suivi comportemental. Nous ne savons pas comment vous utilisez le site, et c'est voulu.</p>
+    <h3><%= t('privacyPolicy.analytics') %></h3>
+    <p><strong><%= t('privacyPolicy.analyticsNone') %></strong></p>
+    <p><%= t('privacyPolicy.analyticsNote') %></p>
 
-    <h3>Bases légales (GDPR)</h3>
-    <p>Conformément au RGPD :</p>
+    <h3><%= t('privacyPolicy.gdpr') %></h3>
+    <p><%= t('privacyPolicy.gdprIntro') %></p>
     <ul>
-        <li><strong>Base légale :</strong> Intérêt légitime (fournir un service de soutien par les pairs)</li>
-        <li><strong>Minimisation des données :</strong> Seules les données strictement nécessaires sont collectées</li>
-        <li><strong>Stockage :</strong> Données hébergées en Belgique</li>
-        <li><strong>Durée de conservation :</strong> Tant que votre compte existe</li>
-    </ul>
-
-    <h3>Vos droits</h3>
-    <p>Vous avez le droit de :</p>
-    <ul>
-        <li><strong>Accès :</strong> Voir tous vos messages</li>
-        <li><strong>Suppression :</strong> Supprimer votre compte et tous vos messages</li>
-        <li><strong>Portabilité :</strong> Exporter vos données en JSON</li>
-    </ul>
-    <p><em>Note : Pas de "droit à la rectification" du pseudo, car cela compromettrait la sécurité.</em></p>
-
-    <h3>Sécurité</h3>
-    <p>Mesures de sécurité en place :</p>
-    <ul>
-        <li>🔒 HTTPS obligatoire (TLS 1.3)</li>
-        <li>🔒 Code PIN chiffré avec Argon2id (64MB memory cost)</li>
-        <li>🔒 Sessions stockées dans Redis avec expiration</li>
-        <li>🔒 Headers de sécurité (CSP, HSTS, etc.)</li>
-        <li>🔒 Protection contre les injections SQL</li>
-        <li>🔒 Protection contre les attaques XSS</li>
-        <li>🔒 Rate limiting pour prévenir les abus</li>
+        <li><strong><%= t('privacyPolicy.legalBasis') %></strong> <%= t('privacyPolicy.legalBasisText') %></li>
+        <li><strong><%= t('privacyPolicy.dataMinimization') %></strong> <%= t('privacyPolicy.dataMinimizationText') %></li>
+        <li><strong><%= t('privacyPolicy.storage') %></strong> <%= t('privacyPolicy.storageText') %></li>
+        <li><strong><%= t('privacyPolicy.retention') %></strong> <%= t('privacyPolicy.retentionText') %></li>
     </ul>
 
-    <h3>Partage de données</h3>
-    <p><strong>Nous ne partageons AUCUNE donnée avec des tiers.</strong></p>
-    <p>Pas de régie publicitaire, pas de partenaires commerciaux, pas de vente de données.</p>
-
-    <h3>Autorités légales</h3>
-    <p>En cas de demande légitime des autorités belges :</p>
+    <h3><%= t('privacyPolicy.yourRights') %></h3>
+    <p><%= t('privacyPolicy.yourRightsIntro') %></p>
     <ul>
-        <li>Nous ne pouvons fournir QUE : pseudo, messages publics, dates de création</li>
-        <li>Nous ne pouvons PAS fournir : adresse IP (nous ne les stockons pas), identité réelle (nous ne la connaissons pas)</li>
+        <li><strong><%= t('privacyPolicy.accessRight') %></strong> <%= t('privacyPolicy.accessRightText') %></li>
+        <li><strong><%= t('privacyPolicy.deletionRight') %></strong> <%= t('privacyPolicy.deletionRightText') %></li>
+        <li><strong><%= t('privacyPolicy.portabilityRight') %></strong> <%= t('privacyPolicy.portabilityRightText') %></li>
+    </ul>
+    <p><em><%= t('privacyPolicy.noRectification') %></em></p>
+
+    <h3><%= t('privacyPolicy.security') %></h3>
+    <p><%= t('privacyPolicy.securityIntro') %></p>
+    <ul>
+        <li>🔒 <%= t('privacyPolicy.https') %></li>
+        <li>🔒 <%= t('privacyPolicy.pinEncryption') %></li>
+        <li>🔒 <%= t('privacyPolicy.sessions') %></li>
+        <li>🔒 <%= t('privacyPolicy.securityHeaders') %></li>
+        <li>🔒 <%= t('privacyPolicy.sqlProtection') %></li>
+        <li>🔒 <%= t('privacyPolicy.xssProtection') %></li>
+        <li>🔒 <%= t('privacyPolicy.rateLimiting') %></li>
     </ul>
 
-    <h3>Modifications de cette politique</h3>
-    <p>Nous vous informerons de toute modification importante via une bannière sur le site.</p>
+    <h3><%= t('privacyPolicy.dataSharing') %></h3>
+    <p><strong><%= t('privacyPolicy.noSharing') %></strong></p>
+    <p><%= t('privacyPolicy.noSharingNote') %></p>
 
-    <h3>Contact</h3>
-    <p>Pour toute question sur cette politique : Voir la page <a href="/about">À propos</a></p>
+    <h3><%= t('privacyPolicy.legal') %></h3>
+    <p><%= t('privacyPolicy.legalIntro') %></p>
+    <ul>
+        <li><%= t('privacyPolicy.legalCan') %></li>
+        <li><%= t('privacyPolicy.legalCannot') %></li>
+    </ul>
+
+    <h3><%= t('privacyPolicy.modifications') %></h3>
+    <p><%= t('privacyPolicy.modificationsNote') %></p>
+
+    <h3><%= t('privacyPolicy.contact') %></h3>
+    <p><%= t('privacyPolicy.contactNote') %> <a href="/about"><%= t('privacyPolicy.aboutPage') %></a></p>
 
     <hr style="margin: 2rem 0;">
 
     <p style="font-style: italic; color: #7f8c8d;">
-        Cette politique de confidentialité reflète notre engagement envers votre anonymat.
-        Nous croyons que la vie privée est un droit fondamental, pas un privilège.
+        <%= t('privacyPolicy.footer') %>
     </p>
 </div>
 

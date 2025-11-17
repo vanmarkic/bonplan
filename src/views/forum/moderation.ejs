@@ -1,44 +1,44 @@
-<%- include('../partials/header', { title: 'Tableau de bord de modération - Le Syndicat des Tox' }) %>
+<%- include('../partials/header', { title: t('moderationDashboard.pageTitle') }) %>
 
 <!-- Breadcrumb navigation -->
 <div style="margin-bottom: 1.5rem;">
-    <a href="/forum/threads" style="color: #3498db; text-decoration: none;">← Retour aux discussions</a>
+    <a href="/forum/threads" style="color: #3498db; text-decoration: none;">← <%= t('actions.back') %> <%= t('forum.threads').toLowerCase() %></a>
 </div>
 
-<h2>🛡️ Tableau de bord de modération</h2>
+<h2>🛡️ <%= t('moderationDashboard.title') %></h2>
 
 <% if (!user || !user.isModerator) { %>
     <div class="alert alert-error">
-        <strong>Accès refusé</strong>
-        <p>Cette page est réservée aux modérateurs.</p>
-        <a href="/forum/threads" class="btn btn-secondary" style="margin-top: 0.5rem;">Retour aux discussions</a>
+        <strong><%= t('moderationDashboard.accessDenied') %></strong>
+        <p><%= t('moderationDashboard.moderatorsOnly') %></p>
+        <a href="/forum/threads" class="btn btn-secondary" style="margin-top: 0.5rem;"><%= t('actions.back') %> <%= t('forum.threads').toLowerCase() %></a>
     </div>
 <% } else { %>
 
     <!-- Moderation stats -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
         <div style="background: #fee; padding: 1rem; border-radius: 4px; border: 1px solid #fcc;">
-            <h3 style="margin: 0; color: #c00;">⚠️ Signalements</h3>
+            <h3 style="margin: 0; color: #c00;">⚠️ <%= t('moderationDashboard.reports') %></h3>
             <p style="font-size: 2rem; margin: 0.5rem 0; font-weight: bold;"><%= stats.reportedCount || 0 %></p>
-            <p style="margin: 0; font-size: 0.875rem; color: #999;">À traiter</p>
+            <p style="margin: 0; font-size: 0.875rem; color: #999;"><%= t('moderationDashboard.toProcess') %></p>
         </div>
 
         <div style="background: #ffe; padding: 1rem; border-radius: 4px; border: 1px solid #ffc;">
-            <h3 style="margin: 0; color: #f39c12;">📌 Épinglés</h3>
+            <h3 style="margin: 0; color: #f39c12;">📌 <%= t('moderationDashboard.pinned') %></h3>
             <p style="font-size: 2rem; margin: 0.5rem 0; font-weight: bold;"><%= stats.pinnedCount || 0 %></p>
-            <p style="margin: 0; font-size: 0.875rem; color: #999;">Discussions</p>
+            <p style="margin: 0; font-size: 0.875rem; color: #999;"><%= t('moderationDashboard.threads') %></p>
         </div>
 
         <div style="background: #f0f0f0; padding: 1rem; border-radius: 4px; border: 1px solid #ddd;">
-            <h3 style="margin: 0; color: #7f8c8d;">🔒 Verrouillés</h3>
+            <h3 style="margin: 0; color: #7f8c8d;">🔒 <%= t('moderationDashboard.locked') %></h3>
             <p style="font-size: 2rem; margin: 0.5rem 0; font-weight: bold;"><%= stats.lockedCount || 0 %></p>
-            <p style="margin: 0; font-size: 0.875rem; color: #999;">Discussions</p>
+            <p style="margin: 0; font-size: 0.875rem; color: #999;"><%= t('moderationDashboard.threads') %></p>
         </div>
 
         <div style="background: #efe; padding: 1rem; border-radius: 4px; border: 1px solid #cfc;">
-            <h3 style="margin: 0; color: #27ae60;">✅ Traités</h3>
+            <h3 style="margin: 0; color: #27ae60;">✅ <%= t('moderationDashboard.resolved') %></h3>
             <p style="font-size: 2rem; margin: 0.5rem 0; font-weight: bold;"><%= stats.resolvedToday || 0 %></p>
-            <p style="margin: 0; font-size: 0.875rem; color: #999;">Aujourd'hui</p>
+            <p style="margin: 0; font-size: 0.875rem; color: #999;"><%= t('moderationDashboard.today') %></p>
         </div>
     </div>
 
@@ -46,23 +46,23 @@
     <div style="border-bottom: 2px solid #ecf0f1; margin-bottom: 2rem;">
         <div style="display: flex; gap: 1rem;">
             <button onclick="showTab('reported')" id="tab-reported" class="btn btn-secondary" style="border-radius: 4px 4px 0 0; border-bottom: 2px solid transparent;">
-                ⚠️ Signalements (<%= reportedItems ? reportedItems.length : 0 %>)
+                ⚠️ <%= t('moderationDashboard.reportedTab') %> (<%= reportedItems ? reportedItems.length : 0 %>)
             </button>
             <button onclick="showTab('hidden')" id="tab-hidden" class="btn btn-secondary" style="border-radius: 4px 4px 0 0; border-bottom: 2px solid transparent;">
-                👁️ Contenu masqué (<%= hiddenItems ? hiddenItems.length : 0 %>)
+                👁️ <%= t('moderationDashboard.hiddenTab') %> (<%= hiddenItems ? hiddenItems.length : 0 %>)
             </button>
             <button onclick="showTab('pinned')" id="tab-pinned" class="btn btn-secondary" style="border-radius: 4px 4px 0 0; border-bottom: 2px solid transparent;">
-                📌 Discussions épinglées (<%= pinnedThreads ? pinnedThreads.length : 0 %>)
+                📌 <%= t('moderationDashboard.pinnedTab') %> (<%= pinnedThreads ? pinnedThreads.length : 0 %>)
             </button>
             <button onclick="showTab('logs')" id="tab-logs" class="btn btn-secondary" style="border-radius: 4px 4px 0 0; border-bottom: 2px solid transparent;">
-                📋 Journal d'activité
+                📋 <%= t('moderationDashboard.logsTab') %>
             </button>
         </div>
     </div>
 
     <!-- Tab content: Reported items -->
     <div id="content-reported" class="tab-content">
-        <h3>Contenu signalé</h3>
+        <h3><%= t('moderationDashboard.reportedContent') %></h3>
 
         <% if (reportedItems && reportedItems.length > 0) { %>
             <% reportedItems.forEach(item => { %>
@@ -71,23 +71,23 @@
                         <div style="flex: 1;">
                             <h4 style="margin: 0 0 0.5rem 0;">
                                 <% if (item.type === 'thread') { %>
-                                    📄 Discussion:
+                                    📄 <%= t('moderationDashboard.thread') %>:
                                 <% } else { %>
-                                    💬 Réponse:
+                                    💬 <%= t('moderationDashboard.reply') %>:
                                 <% } %>
                                 <a href="<%= item.type === 'thread' ? '/forum/threads/' + item.id : '/forum/threads/' + item.threadId + '#reply-' + item.id %>" target="_blank">
-                                    <%= item.title || 'Sans titre' %>
+                                    <%= item.title || t('moderationDashboard.noTitle') %>
                                 </a>
                             </h4>
 
                             <div class="thread-meta">
-                                <span>Auteur: <strong><%= item.author || '[supprimé]' %></strong></span>
-                                <span> • Signalé le: <%= item.reportedAt %></span>
-                                <span> • Nombre de signalements: <strong style="color: #e74c3c;"><%= item.reportCount || 1 %></strong></span>
+                                <span><%= t('moderationDashboard.author') %>: <strong><%= item.author || t('forum.deleted') %></strong></span>
+                                <span> • <%= t('moderationDashboard.reportedOn') %>: <%= item.reportedAt %></span>
+                                <span> • <%= t('moderationDashboard.reportCount') %>: <strong style="color: #e74c3c;"><%= item.reportCount || 1 %></strong></span>
                             </div>
 
                             <div style="margin: 1rem 0;">
-                                <strong>Raisons des signalements:</strong>
+                                <strong><%= t('moderationDashboard.reportReasons') %>:</strong>
                                 <ul style="margin: 0.5rem 0 0 1.5rem;">
                                     <% if (item.reportReasons && item.reportReasons.length > 0) { %>
                                         <% item.reportReasons.forEach(reason => { %>
@@ -96,19 +96,19 @@
                                                 <% if (reason.details) { %>
                                                     : "<%= reason.details %>"
                                                 <% } %>
-                                                <span class="text-small">(par <%= reason.reporter || 'anonyme' %>)</span>
+                                                <span class="text-small">(<%= t('moderationDashboard.by') %> <%= reason.reporter || t('moderationDashboard.anonymous') %>)</span>
                                             </li>
                                         <% }); %>
                                     <% } else { %>
-                                        <li>Pas de détails disponibles</li>
+                                        <li><%= t('moderationDashboard.noDetails') %></li>
                                     <% } %>
                                 </ul>
                             </div>
 
                             <div style="background: #f9f9f9; padding: 0.75rem; border-radius: 4px; margin: 1rem 0;">
-                                <strong>Extrait du contenu:</strong>
+                                <strong><%= t('moderationDashboard.excerpt') %>:</strong>
                                 <p style="margin: 0.5rem 0 0 0;">
-                                    <%= item.excerpt ? item.excerpt.substring(0, 300) : '[Contenu non disponible]' %>
+                                    <%= item.excerpt ? item.excerpt.substring(0, 300) : t('moderationDashboard.noContent') %>
                                     <%= item.excerpt && item.excerpt.length > 300 ? '...' : '' %>
                                 </p>
                             </div>
@@ -116,20 +116,20 @@
                     </div>
 
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
-                        <strong>Actions:</strong>
+                        <strong><%= t('moderationDashboard.actions') %>:</strong>
                         <div style="margin-top: 0.5rem;">
                             <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'dismiss')" class="btn btn-secondary">
-                                ✅ Ignorer (pas de problème)
+                                ✅ <%= t('moderationDashboard.dismiss') %>
                             </button>
                             <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'hide')" class="btn btn-warning">
-                                👁️ Masquer le contenu
+                                👁️ <%= t('moderationDashboard.hideContent') %>
                             </button>
                             <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'delete')" class="btn btn-danger">
-                                🗑️ Supprimer définitivement
+                                🗑️ <%= t('moderationDashboard.deletePermanently') %>
                             </button>
                             <% if (item.type === 'thread') { %>
                                 <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'lock')" class="btn btn-warning">
-                                    🔒 Verrouiller la discussion
+                                    🔒 <%= t('moderationDashboard.lockThread') %>
                                 </button>
                             <% } %>
                         </div>
@@ -139,58 +139,57 @@
         <% } else { %>
             <div class="no-results">
                 <p style="font-size: 2rem;">✅</p>
-                <p>Aucun contenu signalé à traiter!</p>
+                <p><%= t('moderationDashboard.noReportedContent') %></p>
             </div>
         <% } %>
     </div>
 
     <!-- Tab content: Hidden items -->
     <div id="content-hidden" class="tab-content" style="display: none;">
-        <h3>Contenu masqué</h3>
+        <h3><%= t('moderationDashboard.hiddenContent') %></h3>
 
         <% if (hiddenItems && hiddenItems.length > 0) { %>
             <% hiddenItems.forEach(item => { %>
                 <div class="moderation-item">
                     <h4>
                         <% if (item.type === 'thread') { %>
-                            📄 Discussion:
+                            📄 <%= t('moderationDashboard.thread') %>:
                         <% } else { %>
-                            💬 Réponse:
+                            💬 <%= t('moderationDashboard.reply') %>:
                         <% } %>
-                        <%= item.title || 'Sans titre' %>
+                        <%= item.title || t('moderationDashboard.noTitle') %>
                     </h4>
 
                     <div class="thread-meta">
-                        <span>Auteur: <%= item.author || '[supprimé]' %></span>
-                        <span> • Masqué le: <%= item.hiddenAt %></span>
-                        <span> • Par: <%= item.moderatedBy %></span>
+                        <span><%= t('moderationDashboard.author') %>: <%= item.author || t('forum.deleted') %></span>
+                        <span> • <%= t('moderationDashboard.hiddenOn') %>: <%= item.hiddenAt %></span>
+                        <span> • <%= t('moderationDashboard.by') %>: <%= item.moderatedBy %></span>
                     </div>
 
                     <div style="margin-top: 1rem;">
                         <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'unhide')" class="btn btn-secondary">
-                            👁️ Rendre visible
+                            👁️ <%= t('moderationDashboard.makeVisible') %>
                         </button>
                         <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'delete')" class="btn btn-danger">
-                            🗑️ Supprimer définitivement
+                            🗑️ <%= t('moderationDashboard.deletePermanently') %>
                         </button>
                     </div>
                 </div>
             <% }); %>
         <% } else { %>
             <div class="no-results">
-                <p>Aucun contenu masqué</p>
+                <p><%= t('moderationDashboard.noHiddenContent') %></p>
             </div>
         <% } %>
     </div>
 
     <!-- Tab content: Pinned threads -->
     <div id="content-pinned" class="tab-content" style="display: none;">
-        <h3>Discussions épinglées</h3>
+        <h3><%= t('moderationDashboard.pinnedThreads') %></h3>
 
         <% if (pinnedThreads && pinnedThreads.length > 0) { %>
             <div class="alert alert-info" style="margin-bottom: 1rem;">
-                <strong>Note:</strong> Les discussions épinglées apparaissent en haut de la liste des discussions.
-                Limitez-vous à 3-5 discussions épinglées maximum pour une meilleure expérience utilisateur.
+                <strong><%= t('moderationDashboard.note') %>:</strong> <%= t('moderationDashboard.pinnedNote') %>
             </div>
 
             <% pinnedThreads.forEach(thread => { %>
@@ -202,18 +201,18 @@
                     </h4>
 
                     <div class="thread-meta">
-                        <span>Auteur: <%= thread.author || '[supprimé]' %></span>
-                        <span> • Épinglé le: <%= thread.pinnedAt %></span>
-                        <span> • <%= thread.replyCount || 0 %> réponses</span>
+                        <span><%= t('moderationDashboard.author') %>: <%= thread.author || t('forum.deleted') %></span>
+                        <span> • <%= t('moderationDashboard.pinnedOn') %>: <%= thread.pinnedAt %></span>
+                        <span> • <%= thread.replyCount || 0 %> <%= thread.replyCount !== 1 ? t('forum.replies') : t('forum.reply') %></span>
                     </div>
 
                     <div style="margin-top: 1rem;">
                         <button onclick="moderateItem('thread', '<%= thread.id %>', 'unpin')" class="btn btn-secondary">
-                            📌 Désépingler
+                            📌 <%= t('moderationDashboard.unpin') %>
                         </button>
                         <% if (!thread.isLocked) { %>
                             <button onclick="moderateItem('thread', '<%= thread.id %>', 'lock')" class="btn btn-warning">
-                                🔒 Verrouiller
+                                🔒 <%= t('moderationDashboard.lock') %>
                             </button>
                         <% } %>
                     </div>
@@ -221,9 +220,9 @@
             <% }); %>
         <% } else { %>
             <div class="no-results">
-                <p>Aucune discussion épinglée</p>
+                <p><%= t('moderationDashboard.noPinnedThreads') %></p>
                 <a href="/forum/threads" class="btn btn-secondary" style="margin-top: 1rem;">
-                    Parcourir les discussions
+                    <%= t('moderationDashboard.browseThreads') %>
                 </a>
             </div>
         <% } %>
@@ -231,17 +230,17 @@
 
     <!-- Tab content: Activity logs -->
     <div id="content-logs" class="tab-content" style="display: none;">
-        <h3>Journal d'activité de modération (dernières 48h)</h3>
+        <h3><%= t('moderationDashboard.activityLog') %></h3>
 
         <% if (activityLogs && activityLogs.length > 0) { %>
             <div style="max-height: 500px; overflow-y: auto;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background: #ecf0f1;">
-                            <th style="padding: 0.5rem; text-align: left;">Date/Heure</th>
-                            <th style="padding: 0.5rem; text-align: left;">Modérateur</th>
-                            <th style="padding: 0.5rem; text-align: left;">Action</th>
-                            <th style="padding: 0.5rem; text-align: left;">Cible</th>
+                            <th style="padding: 0.5rem; text-align: left;"><%= t('moderationDashboard.dateTime') %></th>
+                            <th style="padding: 0.5rem; text-align: left;"><%= t('moderationDashboard.moderator') %></th>
+                            <th style="padding: 0.5rem; text-align: left;"><%= t('moderationDashboard.action') %></th>
+                            <th style="padding: 0.5rem; text-align: left;"><%= t('moderationDashboard.target') %></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -257,7 +256,7 @@
                                 <td style="padding: 0.5rem;">
                                     <% if (log.targetUrl) { %>
                                         <a href="<%= log.targetUrl %>" target="_blank">
-                                            <%= log.targetTitle || 'Voir' %>
+                                            <%= log.targetTitle || t('moderationDashboard.view') %>
                                         </a>
                                     <% } else { %>
                                         <%= log.targetTitle || 'N/A' %>
@@ -270,20 +269,20 @@
             </div>
         <% } else { %>
             <div class="no-results">
-                <p>Aucune activité de modération récente</p>
+                <p><%= t('moderationDashboard.noActivity') %></p>
             </div>
         <% } %>
     </div>
 
     <!-- Moderation guidelines -->
     <div class="alert alert-info" style="margin-top: 2rem;">
-        <h4>📋 Principes de modération</h4>
+        <h4>📋 <%= t('moderationDashboard.guidelines') %></h4>
         <ul style="margin: 0.5rem 0 0 1.5rem;">
-            <li>Privilégiez toujours la bienveillance et le dialogue</li>
-            <li>Ne supprimez que le contenu clairement dangereux ou illégal</li>
-            <li>Respectez les principes de réduction des risques</li>
-            <li>En cas de doute, consultez les autres modérateurs</li>
-            <li>Documentez vos actions importantes dans le journal</li>
+            <li><%= t('moderationDashboard.guideline1') %></li>
+            <li><%= t('moderationDashboard.guideline2') %></li>
+            <li><%= t('moderationDashboard.guideline3') %></li>
+            <li><%= t('moderationDashboard.guideline4') %></li>
+            <li><%= t('moderationDashboard.guideline5') %></li>
         </ul>
     </div>
 
@@ -346,10 +345,10 @@ function showTab(tabName) {
 }
 
 function moderateItem(type, id, action) {
-    let confirmMsg = 'Confirmer cette action: ' + action + '?';
+    let confirmMsg = '<%= t('moderationDashboard.confirmAction') %>: ' + action + '?';
 
     if (action === 'delete') {
-        confirmMsg = 'ATTENTION: Cette action est irréversible! Confirmer la suppression?';
+        confirmMsg = '<%= t('moderationDashboard.deleteWarning') %>';
     }
 
     if (confirm(confirmMsg)) {

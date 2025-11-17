@@ -434,18 +434,23 @@ class Thread {
    * @param {Object} options - Query options
    * @param {number} options.limit - Number of threads (default: 10)
    * @param {number} options.offset - Number to skip (default: 0)
+   * @param {boolean} options.includeBody - Include thread body (default: false)
    * @returns {Promise<Array>} Array of threads
    */
   static async findByAuthor(authorPseudo, options = {}) {
     const {
       limit = 10,
-      offset = 0
+      offset = 0,
+      includeBody = false
     } = options;
+
+    const bodyField = includeBody ? 'body,' : '';
 
     const query = `
       SELECT
         id,
         title,
+        ${bodyField}
         created_at,
         last_activity,
         reply_count,
