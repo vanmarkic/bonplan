@@ -10,6 +10,10 @@
     "test:unit": "jest --testPathPattern=tests/unit",
     "test:integration": "jest --testPathPattern=tests/integration",
     "test:security": "jest --testPathPattern=tests/security",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
     "test:a11y": "pa11y-ci",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
@@ -57,6 +61,7 @@
     "winston": "^3.13.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "@types/node": "^20.14.2",
     "autoprefixer": "^10.4.19",
     "cssnano": "^7.0.1",
