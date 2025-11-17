@@ -96,7 +96,7 @@
                             <% if (result.type === 'reply') { %>
                                 💬 Re:
                             <% } %>
-                            <%- highlightSearchTerms(result.title, query) %>
+                            <%- result.title %>
                         </a>
                     </div>
 
@@ -115,7 +115,7 @@
                     </div>
 
                     <div class="thread-excerpt">
-                        <%- highlightSearchTerms(result.excerpt, query) %>
+                        <%- result.excerpt %>
                     </div>
                 </div>
             <% }); %>
@@ -184,22 +184,8 @@
     <% } %>
 <% } %>
 
-<!-- Helper functions (normally in backend, shown here for clarity) -->
+<!-- Helper functions -->
 <%
-function highlightSearchTerms(text, searchQuery) {
-    if (!text || !searchQuery) return text;
-
-    const terms = searchQuery.split(' ').filter(term => term.length > 1);
-    let highlightedText = text;
-
-    terms.forEach(term => {
-        const regex = new RegExp(`(${term})`, 'gi');
-        highlightedText = highlightedText.replace(regex, '<span class="search-highlight">$1</span>');
-    });
-
-    return highlightedText;
-}
-
 function getLanguageName(code) {
     const languages = {
         'fr': 'Français',

@@ -21,6 +21,9 @@ const ReportService = require('../services/reportService');
 // Database
 const db = require('../utils/database');
 
+// Utilities
+const { sanitizeContent, highlightSearchTerms } = require('../utils/sanitize');
+
 // Middleware
 const { requireAuth, checkAuth } = require('../middleware/requireAuth');
 const { requireModerator, checkModerator } = require('../middleware/requireModerator');
@@ -241,6 +244,14 @@ router.get('/threads/:id', [
     // Check if user can moderate
     const canModerate = res.locals.isModerator;
 
+    // SECURITY: Sanitize all user-generated content to prevent XSS
+    thread.content = sanitizeContent(thread.content, true);
+
+    // Sanitize all reply content
+    replies.forEach((reply) => {
+      reply.content = sanitizeContent(reply.content, true);
+    });
+
     res.render('forum/thread', {
       title: `${thread.title} - Le Syndicat des Tox`,
       thread,
@@ -318,6 +329,17 @@ router.post('/search', [
       limit,
       offset,
       language
+    });
+
+    // SECURITY: Sanitize and highlight search results to prevent XSS
+    results.forEach((result) => {
+      // Sanitize and highlight title
+      result.title = highlightSearchTerms(result.title, searchTerm);
+
+      // Sanitize and highlight excerpt
+      if (result.excerpt) {
+        result.excerpt = highlightSearchTerms(result.excerpt, searchTerm);
+      }
     });
 
     // For pagination, we'd need a count method for search results

@@ -36,7 +36,7 @@
         <% if (thread.isDeleted) { %>
             <p class="deleted-content"><%= t('forum.deleted') %></p>
         <% } else { %>
-            <%- thread.content.replace(/\n/g, '<br>') %>
+            <%- thread.content %>
         <% } %>
     </div>
 
@@ -166,7 +166,7 @@
                     <% if (reply.isDeleted) { %>
                         <p class="deleted-content"><%= t('forum.deleted') %></p>
                     <% } else { %>
-                        <%- reply.content.replace(/\n/g, '<br>') %>
+                        <%- reply.content %>
                     <% } %>
                 </div>
 
