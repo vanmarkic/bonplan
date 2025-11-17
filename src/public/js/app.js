@@ -4,9 +4,7 @@
  * Target: < 20KB minified
  */
 
-(function() {
-  'use strict';
-
+(function () {
   // ===== CSRF Token Management =====
   const csrfToken = document.querySelector('meta[name="csrf-token"]');
 
@@ -17,7 +15,7 @@
   // Add CSRF token to all forms automatically
   function addCSRFToForms() {
     const forms = document.querySelectorAll('form[method="post"], form[method="POST"]');
-    forms.forEach(form => {
+    forms.forEach((form) => {
       if (!form.querySelector('input[name="_csrf"]')) {
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -33,7 +31,7 @@
     const inputs = form.querySelectorAll('[required]');
     let isValid = true;
 
-    inputs.forEach(input => {
+    inputs.forEach((input) => {
       const errorElement = input.parentElement.querySelector('.form-error');
 
       // Remove previous errors
@@ -74,7 +72,7 @@
   function setupCharacterCounters() {
     const textareas = document.querySelectorAll('textarea[data-maxlength]');
 
-    textareas.forEach(textarea => {
+    textareas.forEach((textarea) => {
       const maxLength = parseInt(textarea.dataset.maxlength);
       const counter = document.createElement('div');
       counter.className = 'character-counter';
@@ -107,7 +105,7 @@
   function setupAutoDismissAlerts() {
     const alerts = document.querySelectorAll('.alert[data-autodismiss]');
 
-    alerts.forEach(alert => {
+    alerts.forEach((alert) => {
       const delay = parseInt(alert.dataset.autodismiss) || 5000;
       setTimeout(() => {
         alert.style.opacity = '0';
@@ -122,7 +120,7 @@
     // Skip link functionality
     const skipLink = document.querySelector('.skip-link');
     if (skipLink) {
-      skipLink.addEventListener('click', function(e) {
+      skipLink.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
@@ -133,7 +131,7 @@
     }
 
     // Escape key to close modals/dialogs
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         const activeModal = document.querySelector('.modal.active');
         if (activeModal) {
@@ -146,7 +144,7 @@
     const threadItems = document.querySelectorAll('.thread-item a');
     if (threadItems.length > 0) {
       threadItems.forEach((item, index) => {
-        item.addEventListener('keydown', function(e) {
+        item.addEventListener('keydown', (e) => {
           if (e.key === 'ArrowDown' && threadItems[index + 1]) {
             e.preventDefault();
             threadItems[index + 1].focus();
@@ -163,8 +161,8 @@
   function setupConfirmDialogs() {
     const dangerousActions = document.querySelectorAll('[data-confirm]');
 
-    dangerousActions.forEach(element => {
-      element.addEventListener('click', function(e) {
+    dangerousActions.forEach((element) => {
+      element.addEventListener('click', function (e) {
         const message = this.dataset.confirm;
         if (!confirm(message)) {
           e.preventDefault();
@@ -177,7 +175,7 @@
   function setupAutoSave() {
     const forms = document.querySelectorAll('form[data-autosave]');
 
-    forms.forEach(form => {
+    forms.forEach((form) => {
       const key = form.dataset.autosave;
       const inputs = form.querySelectorAll('input, textarea, select');
 
@@ -186,7 +184,7 @@
       if (saved) {
         try {
           const data = JSON.parse(saved);
-          Object.keys(data).forEach(name => {
+          Object.keys(data).forEach((name) => {
             const input = form.querySelector(`[name="${name}"]`);
             if (input && !input.value) {
               input.value = data[name];
@@ -198,10 +196,10 @@
       }
 
       // Save on input
-      inputs.forEach(input => {
-        input.addEventListener('input', debounce(function() {
+      inputs.forEach((input) => {
+        input.addEventListener('input', debounce(() => {
           const formData = {};
-          inputs.forEach(inp => {
+          inputs.forEach((inp) => {
             if (inp.name) {
               formData[inp.name] = inp.value;
             }
@@ -211,7 +209,7 @@
       });
 
       // Clear on submit
-      form.addEventListener('submit', function() {
+      form.addEventListener('submit', () => {
         localStorage.removeItem(key);
       });
     });
@@ -256,12 +254,12 @@
   function setupReportButtons() {
     const reportButtons = document.querySelectorAll('[data-report]');
 
-    reportButtons.forEach(button => {
-      button.addEventListener('click', async function(e) {
+    reportButtons.forEach((button) => {
+      button.addEventListener('click', async function (e) {
         e.preventDefault();
 
-        const contentType = this.dataset.contentType;
-        const contentId = this.dataset.contentId;
+        const { contentType } = this.dataset;
+        const { contentId } = this.dataset;
         const reason = prompt('Raison du signalement / Reden voor rapportage / Grund für Meldung:');
 
         if (!reason) return;
@@ -293,14 +291,14 @@
   function setupLazyLoading() {
     if ('loading' in HTMLImageElement.prototype) {
       const images = document.querySelectorAll('img[data-src]');
-      images.forEach(img => {
+      images.forEach((img) => {
         img.src = img.dataset.src;
       });
     } else {
       // Fallback for older browsers
       const images = document.querySelectorAll('img[data-src]');
       const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const img = entry.target;
             img.src = img.dataset.src;
@@ -309,7 +307,7 @@
         });
       });
 
-      images.forEach(img => imageObserver.observe(img));
+      images.forEach((img) => imageObserver.observe(img));
     }
   }
 
@@ -320,7 +318,7 @@
 
     const currentMode = localStorage.getItem('darkMode') || 'auto';
 
-    toggle.addEventListener('click', function() {
+    toggle.addEventListener('click', () => {
       const newMode = currentMode === 'dark' ? 'light' : 'dark';
       localStorage.setItem('darkMode', newMode);
       applyDarkMode(newMode);
@@ -350,8 +348,8 @@
 
     // Form enhancements
     const forms = document.querySelectorAll('form');
-    forms.forEach(form => {
-      form.addEventListener('submit', function(e) {
+    forms.forEach((form) => {
+      form.addEventListener('submit', function (e) {
         if (!validateForm(this)) {
           e.preventDefault();
           announce('Erreurs dans le formulaire / Fouten in formulier / Formularfehler', 'assertive');
@@ -382,8 +380,7 @@
 
   // ===== Export Public API =====
   window.SyndicatTox = {
-    announce: announce,
-    getCSRFToken: getCSRFToken
+    announce,
+    getCSRFToken
   };
-
-})();
+}());

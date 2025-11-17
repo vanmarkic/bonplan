@@ -25,8 +25,8 @@ setInterval(() => {
  */
 function createRateLimiter(options = {}) {
   const {
-    windowMs = 60000,       // Time window in milliseconds (default: 1 minute)
-    max = 5,                // Max requests per window
+    windowMs = 60000, // Time window in milliseconds (default: 1 minute)
+    max = 5, // Max requests per window
     message = 'Trop de requêtes, veuillez réessayer plus tard',
     keyGenerator = (req) => `${req.session?.user?.pseudo || req.anonId || 'unknown'}`,
     skipSuccessfulRequests = false
@@ -91,7 +91,7 @@ function createRateLimiter(options = {}) {
     // Call next with option to decrement on success if configured
     if (skipSuccessfulRequests) {
       const originalSend = res.send;
-      res.send = function(...args) {
+      res.send = function (...args) {
         // Decrement counter if response is successful (2xx)
         if (res.statusCode >= 200 && res.statusCode < 300) {
           limitData.count--;
@@ -111,35 +111,35 @@ const rateLimiters = {
   // For thread/reply creation - strict limits
   posting: createRateLimiter({
     windowMs: 5 * 60 * 1000, // 5 minutes
-    max: 3,                   // 3 posts per 5 minutes
+    max: 3, // 3 posts per 5 minutes
     message: 'Limite de publication atteinte. Attendez quelques minutes.'
   }),
 
   // For editing - moderate limits
   editing: createRateLimiter({
-    windowMs: 60000,          // 1 minute
-    max: 5,                   // 5 edits per minute
+    windowMs: 60000, // 1 minute
+    max: 5, // 5 edits per minute
     message: 'Trop de modifications. Veuillez patienter.'
   }),
 
   // For reporting - prevent abuse
   reporting: createRateLimiter({
-    windowMs: 60000,          // 1 minute
-    max: 3,                   // 3 reports per minute
+    windowMs: 60000, // 1 minute
+    max: 3, // 3 reports per minute
     message: 'Limite de signalements atteinte.'
   }),
 
   // For search - prevent excessive queries
   searching: createRateLimiter({
-    windowMs: 60000,          // 1 minute
-    max: 10,                  // 10 searches per minute
+    windowMs: 60000, // 1 minute
+    max: 10, // 10 searches per minute
     message: 'Trop de recherches. Veuillez patienter.'
   }),
 
   // For general API/page requests - lenient
   general: createRateLimiter({
-    windowMs: 60000,          // 1 minute
-    max: 60,                  // 60 requests per minute
+    windowMs: 60000, // 1 minute
+    max: 60, // 60 requests per minute
     message: 'Trop de requêtes. Veuillez ralentir.'
   })
 };

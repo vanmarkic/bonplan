@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
   delete req.headers['true-client-ip'];
   delete req.headers['x-client-ip'];
   delete req.headers['x-cluster-client-ip'];
-  delete req.headers['forwarded'];
+  delete req.headers.forwarded;
 
   // Override Express IP detection
   Object.defineProperty(req, 'ip', {
@@ -37,9 +37,7 @@ module.exports = (req, res, next) => {
   delete req.headers['x-anonymous-id'];
 
   // Log security warning if we detect any IP-related data
-  const suspiciousHeaders = Object.keys(req.headers).filter(h =>
-    h.includes('ip') || h.includes('forward') || h.includes('client')
-  );
+  const suspiciousHeaders = Object.keys(req.headers).filter((h) => h.includes('ip') || h.includes('forward') || h.includes('client'));
 
   if (suspiciousHeaders.length > 0) {
     logger.security('Suspicious IP-related headers detected and removed', {

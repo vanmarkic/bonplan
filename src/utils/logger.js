@@ -15,7 +15,7 @@ const redactSensitiveData = winston.format((info) => {
 
   // Redact sensitive fields from message object
   if (typeof info === 'object') {
-    sensitiveFields.forEach(field => {
+    sensitiveFields.forEach((field) => {
       if (info[field]) {
         info[field] = '[REDACTED]';
       }
@@ -24,7 +24,7 @@ const redactSensitiveData = winston.format((info) => {
 
   // Redact from message string
   if (typeof info.message === 'string') {
-    sensitiveFields.forEach(field => {
+    sensitiveFields.forEach((field) => {
       const regex = new RegExp(`${field}[=:\\s]+[^\\s,}]+`, 'gi');
       info.message = info.message.replace(regex, `${field}=[REDACTED]`);
     });
@@ -69,7 +69,9 @@ if (!isProduction) {
   logger.add(new winston.transports.Console({
     format: winston.format.combine(
       winston.format.colorize(),
-      winston.format.printf(({ level, message, timestamp, ...meta }) => {
+      winston.format.printf(({
+        level, message, timestamp, ...meta
+      }) => {
         let msg = `${timestamp} [${level}]: ${message}`;
         if (Object.keys(meta).length > 0 && meta.service !== 'syndicat-tox') {
           msg += ` ${JSON.stringify(meta)}`;

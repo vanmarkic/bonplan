@@ -4,6 +4,7 @@
  */
 
 const express = require('express');
+
 const router = express.Router();
 const AuthService = require('../services/authService');
 const logger = require('../utils/logger');

@@ -180,7 +180,7 @@ class ReportService {
     const [rows] = await db.execute(query, [minReports, limit]);
 
     // Parse report reasons
-    return rows.map(row => ({
+    return rows.map((row) => ({
       ...row,
       report_reasons: row.report_reasons ? row.report_reasons.split('|||') : []
     }));
@@ -224,7 +224,7 @@ class ReportService {
     const [rows] = await db.execute(query, [minReports, limit]);
 
     // Parse report reasons
-    return rows.map(row => ({
+    return rows.map((row) => ({
       ...row,
       report_reasons: row.report_reasons ? row.report_reasons.split('|||') : []
     }));

@@ -295,17 +295,175 @@ EOF
 echo ""
 echo -e "${BLUE}Step 14: Security hardening...${NC}"
 
-# Disable root login (optional)
-# sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+# Configure SSH security
+echo "Hardening SSH configuration..."
+sed -i 's/#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+systemctl restart sshd || systemctl restart ssh
 
 # Configure fail2ban
 systemctl enable fail2ban
 systemctl start fail2ban
 
+# Create fail2ban jail for Nginx
+cat > /etc/fail2ban/jail.d/nginx.conf << 'EOF'
+[nginx-http-auth]
+enabled = true
+port = http,https
+logpath = /var/log/nginx/error.log
+
+[nginx-limit-req]
+enabled = true
+port = http,https
+logpath = /var/log/nginx/error.log
+maxretry = 10
+EOF
+
+systemctl reload fail2ban
+
+# Configure firewall with rate limiting
+echo "Configuring firewall with rate limiting..."
+ufw --force reset
+ufw default deny incoming
+ufw default allow outgoing
+
+# Allow SSH with rate limiting
+ufw limit 22/tcp comment 'SSH with rate limiting'
+
+# Allow HTTP/HTTPS with rate limiting
+ufw limit 80/tcp comment 'HTTP'
+ufw limit 443/tcp comment 'HTTPS'
+
+# Enable firewall
+ufw --force enable
+
 # Set proper file permissions
 chmod 750 $APP_DIR
 chmod 600 $APP_DIR/.env
+chmod 700 $APP_DIR/logs
 chown -R syndicat:syndicat $APP_DIR
+
+# Secure MySQL installation
+echo "Securing MariaDB..."
+mysql -e "DELETE FROM mysql.user WHERE User='';"
+mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+mysql -e "DROP DATABASE IF EXISTS test;"
+mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+mysql -e "FLUSH PRIVILEGES;"
+
+# Set strict MySQL configuration
+cat >> /etc/mysql/mariadb.conf.d/99-syndicat-security.cnf << EOF
+[mysqld]
+# Security hardening
+local-infile=0
+skip-symbolic-links=1
+bind-address=127.0.0.1
+
+# Performance tuning
+max_connections=100
+max_connect_errors=100
+connect_timeout=10
+wait_timeout=600
+max_allowed_packet=16M
+
+# Logging
+log_error=/var/log/mysql/error.log
+slow_query_log=1
+slow_query_log_file=/var/log/mysql/slow.log
+long_query_time=2
+EOF
+
+systemctl restart mariadb
+
+# Configure Redis security
+echo "Securing Redis..."
+sed -i 's/^bind .*/bind 127.0.0.1 ::1/' /etc/redis/redis.conf
+sed -i 's/# maxmemory-policy.*/maxmemory-policy allkeys-lru/' /etc/redis/redis.conf
+sed -i 's/# maxmemory .*/maxmemory 256mb/' /etc/redis/redis.conf
+
+systemctl restart redis-server
+
+# Disable unnecessary services
+echo "Disabling unnecessary services..."
+systemctl disable avahi-daemon 2>/dev/null || true
+systemctl stop avahi-daemon 2>/dev/null || true
+
+# Set kernel security parameters
+echo "Configuring kernel security parameters..."
+cat >> /etc/sysctl.conf << EOF
+
+# Syndicat Tox Security Settings
+# Network security
+net.ipv4.conf.all.rp_filter=1
+net.ipv4.conf.default.rp_filter=1
+net.ipv4.tcp_syncookies=1
+net.ipv4.conf.all.accept_source_route=0
+net.ipv4.conf.default.accept_source_route=0
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.all.secure_redirects=0
+net.ipv4.conf.default.secure_redirects=0
+net.ipv4.icmp_echo_ignore_broadcasts=1
+net.ipv4.icmp_ignore_bogus_error_responses=1
+net.ipv4.conf.all.log_martians=1
+net.ipv4.conf.default.log_martians=1
+net.ipv6.conf.all.disable_ipv6=0
+net.ipv6.conf.default.disable_ipv6=0
+
+# Kernel hardening
+kernel.dmesg_restrict=1
+kernel.kptr_restrict=2
+kernel.yama.ptrace_scope=1
+EOF
+
+sysctl -p
+
+# Setup automatic security updates
+echo "Configuring automatic security updates..."
+apt install -y unattended-upgrades apt-listchanges
+
+cat > /etc/apt/apt.conf.d/50unattended-upgrades << 'EOF'
+Unattended-Upgrade::Allowed-Origins {
+    "${distro_id}:${distro_codename}-security";
+};
+Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+Unattended-Upgrade::MinimalSteps "true";
+Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+Unattended-Upgrade::Automatic-Reboot "false";
+EOF
+
+systemctl enable unattended-upgrades
+systemctl start unattended-upgrades
+
+# ============================================
+# Step 15: Setup Monitoring and Backups
+# ============================================
+echo ""
+echo -e "${BLUE}Step 15: Setting up monitoring and backups...${NC}"
+
+# Setup cron job for health checks
+echo "Setting up health check cron job..."
+cat > /etc/cron.d/syndicat-tox-health << EOF
+# Health check every 5 minutes
+*/5 * * * * root /var/www/syndicat-tox/scripts/health-check.sh --quiet --alert
+EOF
+
+# Setup cron job for daily backups
+echo "Setting up daily backup cron job..."
+cat > /etc/cron.d/syndicat-tox-backup << EOF
+# Daily backup at 2 AM
+0 2 * * * root /var/www/syndicat-tox/scripts/backup.sh
+EOF
+
+# Create backup directory
+mkdir -p /var/backups/syndicat-tox
+chmod 700 /var/backups/syndicat-tox
+
+# Make scripts executable
+chmod +x $APP_DIR/scripts/*.sh 2>/dev/null || true
 
 # ============================================
 # Installation Complete!
@@ -317,6 +475,8 @@ echo -e "${GREEN}============================================${NC}"
 echo ""
 echo -e "Application: https://${DOMAIN}"
 echo -e "Logs: $APP_DIR/logs/"
+echo -e "Health checks: /var/log/syndicat-tox-health.log"
+echo -e "Backups: /var/backups/syndicat-tox/"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
 echo "1. Review .env file: $APP_DIR/.env"
@@ -324,11 +484,24 @@ echo "2. Review Nginx config: /etc/nginx/sites-available/syndicat-tox.conf"
 echo "3. Test the application: curl https://${DOMAIN}/health"
 echo "4. Monitor logs: tail -f $APP_DIR/logs/app.log"
 echo "5. Check status: systemctl status syndicat-tox (or pm2 status)"
+echo "6. Run health check: bash $APP_DIR/scripts/health-check.sh"
+echo "7. Test backup: sudo bash $APP_DIR/scripts/backup.sh"
+echo ""
+echo -e "${YELLOW}Automation configured:${NC}"
+echo "- Health checks run every 5 minutes"
+echo "- Backups run daily at 2 AM"
+echo "- Security updates install automatically"
+echo "- Log rotation configured for 30 days"
 echo ""
 echo -e "${RED}SECURITY REMINDERS:${NC}"
-echo "- Backup your database regularly"
-echo "- Keep all software updated"
+echo "- Backup your database regularly (automated)"
+echo "- Keep all software updated (automated)"
 echo "- Monitor logs for suspicious activity"
 echo "- Never expose Redis or MariaDB to the internet"
 echo "- Verify IP anonymization is working"
+echo "- Store backup encryption key securely"
+echo "- Test disaster recovery procedures"
+echo ""
+echo -e "${GREEN}Deployment automation ready!${NC}"
+echo "To deploy updates: sudo bash $APP_DIR/scripts/deploy.sh"
 echo ""

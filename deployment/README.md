@@ -7,7 +7,10 @@ This directory contains production-ready configuration files for deploying Le Sy
 ```
 deployment/
 ├── nginx/
-│   └── syndicat-tox.conf      # Nginx reverse proxy with IP anonymization
+│   ├── Dockerfile             # Custom Nginx with Lua support
+│   ├── md5.lua                # Lua script for MD5 hashing (anonymization)
+│   ├── dev.conf               # Development configuration (Docker)
+│   └── syndicat-tox.conf      # Production configuration
 ├── redis/
 │   └── redis.conf             # Redis configuration for sessions
 ├── systemd/
@@ -37,17 +40,41 @@ If you prefer manual setup, follow the [INFRASTRUCTURE.md](../docs/INFRASTRUCTUR
 
 ## Configuration Files
 
-### Nginx (nginx/syndicat-tox.conf)
+### Nginx (nginx/)
+
+**Custom Nginx with Lua Support:**
+
+The project uses a custom Nginx Docker image with Lua support for MD5 hashing. This is required for IP anonymization.
 
 **Critical Features:**
 - **IP Anonymization**: All IP addresses are stripped and replaced with a one-way hash
+- **Lua-based MD5**: Uses nginx-mod-http-lua for MD5 hashing
 - **Rate Limiting**: Prevents abuse while preserving anonymity
 - **Security Headers**: HSTS, CSP, X-Frame-Options, etc.
 - **SSL/TLS**: Modern cipher suites (TLSv1.2+)
 - **Anonymous Logging**: Logs contain no IP addresses
 
-**Installation:**
+**Docker Setup (Development):**
 ```bash
+# Build and start with Docker Compose
+docker compose up -d nginx
+
+# View logs
+docker compose logs -f nginx
+```
+
+**Production Installation:**
+
+First, install Nginx with Lua support:
+```bash
+# On Alpine/Debian/Ubuntu systems
+sudo apt-get install -y nginx nginx-extras lua-resty-string lua-resty-core
+
+# Copy Lua script
+sudo mkdir -p /etc/nginx/lua
+sudo cp deployment/nginx/md5.lua /etc/nginx/lua/
+
+# Copy and enable configuration
 sudo cp deployment/nginx/syndicat-tox.conf /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/syndicat-tox.conf /etc/nginx/sites-enabled/
 sudo nginx -t
@@ -58,6 +85,7 @@ sudo systemctl reload nginx
 - Replace `syndicat-tox.be` with your domain
 - Replace `CHANGE_THIS_SALT_TO_RANDOM_STRING` with: `openssl rand -base64 32`
 - Update SSL certificate paths after running certbot
+- Ensure Lua module is loaded in nginx.conf: `load_module modules/ngx_http_lua_module.so;`
 
 ### Redis (redis/redis.conf)
 

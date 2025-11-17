@@ -4,8 +4,11 @@
  */
 
 const express = require('express');
+
 const router = express.Router();
-const { body, param, query, validationResult } = require('express-validator');
+const {
+  body, param, query, validationResult
+} = require('express-validator');
 
 // Models
 const Thread = require('../models/Thread');
@@ -39,7 +42,7 @@ router.use(checkModerator);
 const handleValidationErrors = (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return errors.array().map(err => err.msg).join(', ');
+    return errors.array().map((err) => err.msg).join(', ');
   }
   return null;
 };
@@ -52,7 +55,7 @@ const setFlashMessage = (req, type, message) => {
 };
 
 const getFlashMessage = (req) => {
-  const flash = req.session.flash;
+  const { flash } = req.session;
   delete req.session.flash;
   return flash;
 };
@@ -231,9 +234,9 @@ router.get('/threads/:id', [
     const totalPages = Math.ceil(totalReplies / limit);
 
     // Check if user can edit thread (within 15 minutes)
-    const canEdit = req.session.user &&
-                   req.session.user.pseudo === thread.author_pseudo &&
-                   (Date.now() - new Date(thread.created_at).getTime() < 15 * 60 * 1000);
+    const canEdit = req.session.user
+                   && req.session.user.pseudo === thread.author_pseudo
+                   && (Date.now() - new Date(thread.created_at).getTime() < 15 * 60 * 1000);
 
     // Check if user can moderate
     const canModerate = res.locals.isModerator;
@@ -1087,9 +1090,9 @@ router.post('/threads/:id/pin', [
     }
 
     // Toggle pin status
-    const success = thread.is_pinned ?
-      await Thread.unpin(threadId) :
-      await Thread.pin(threadId);
+    const success = thread.is_pinned
+      ? await Thread.unpin(threadId)
+      : await Thread.pin(threadId);
 
     if (success) {
       logger.info('Thread pin toggled', {
@@ -1136,9 +1139,9 @@ router.post('/threads/:id/lock', [
     }
 
     // Toggle lock status
-    const success = thread.is_locked ?
-      await Thread.unlock(threadId) :
-      await Thread.lock(threadId);
+    const success = thread.is_locked
+      ? await Thread.unlock(threadId)
+      : await Thread.lock(threadId);
 
     if (success) {
       logger.info('Thread lock toggled', {
@@ -1186,9 +1189,9 @@ router.post('/threads/:id/hide', [
     }
 
     // Toggle hide status
-    const success = thread.is_hidden ?
-      await Thread.unhide(threadId) :
-      await Thread.hide(threadId);
+    const success = thread.is_hidden
+      ? await Thread.unhide(threadId)
+      : await Thread.hide(threadId);
 
     if (success) {
       // Clear reports if unhiding
@@ -1242,9 +1245,9 @@ router.post('/replies/:id/hide', [
     }
 
     // Toggle hide status
-    const success = reply.is_hidden ?
-      await Reply.unhide(replyId) :
-      await Reply.hide(replyId);
+    const success = reply.is_hidden
+      ? await Reply.unhide(replyId)
+      : await Reply.hide(replyId);
 
     if (success) {
       // Clear reports if unhiding
@@ -1435,7 +1438,7 @@ router.post('/forum/export', [
       });
     }
 
-    const pseudo = req.session.user.pseudo;
+    const { pseudo } = req.session.user;
 
     // Get user data
     const user = await User.findByPseudo(pseudo);
@@ -1471,7 +1474,7 @@ router.post('/forum/export', [
         postCount: user.post_count,
         replyCount: user.reply_count
       },
-      threads: threads.map(t => ({
+      threads: threads.map((t) => ({
         id: t.id,
         title: t.title,
         body: t.body,
@@ -1484,7 +1487,7 @@ router.post('/forum/export', [
         isPinned: t.is_pinned,
         isLocked: t.is_locked
       })),
-      replies: replies.map(r => ({
+      replies: replies.map((r) => ({
         id: r.id,
         threadId: r.thread_id,
         threadTitle: r.thread_title,
@@ -1557,7 +1560,7 @@ router.post('/forum/delete-account', [
     }
 
     const { pin } = req.body;
-    const pseudo = req.session.user.pseudo;
+    const { pseudo } = req.session.user;
 
     // Verify PIN
     const user = await User.findByPseudo(pseudo);

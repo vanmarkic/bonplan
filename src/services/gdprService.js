@@ -83,7 +83,7 @@ class GdprService {
           accountAge: stats?.created_at ? this._calculateAccountAge(stats.created_at) : null
         },
         content: {
-          threads: threads.map(thread => ({
+          threads: threads.map((thread) => ({
             id: thread.id,
             title: thread.title,
             body: thread.body,
@@ -97,7 +97,7 @@ class GdprService {
             isDeleted: thread.is_deleted,
             isHidden: thread.is_hidden
           })),
-          replies: replies.map(reply => ({
+          replies: replies.map((reply) => ({
             id: reply.id,
             threadId: reply.thread_id,
             threadTitle: reply.thread_title,
@@ -109,7 +109,7 @@ class GdprService {
           }))
         },
         moderation: {
-          reportsMade: reports.map(report => ({
+          reportsMade: reports.map((report) => ({
             contentType: report.content_type,
             contentId: report.content_id,
             reason: report.reason,
@@ -220,20 +220,20 @@ class GdprService {
 
         // Delete reports made by user
         await connection.execute(
-          `DELETE FROM reports WHERE reporter_pseudo = ?`,
+          'DELETE FROM reports WHERE reporter_pseudo = ?',
           [pseudo]
         );
       }
 
       // Delete login attempts history
       await connection.execute(
-        `DELETE FROM login_attempts WHERE pseudo = ?`,
+        'DELETE FROM login_attempts WHERE pseudo = ?',
         [pseudo]
       );
 
       // Delete the user account
       await connection.execute(
-        `DELETE FROM users WHERE pseudo = ?`,
+        'DELETE FROM users WHERE pseudo = ?',
         [pseudo]
       );
 

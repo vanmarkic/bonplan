@@ -136,7 +136,9 @@ services:
   # Nginx Reverse Proxy (Development)
   # ============================================
   nginx:
-    image: nginx:alpine
+    build:
+      context: ./deployment/nginx
+      dockerfile: Dockerfile
     container_name: syndicat-nginx
     restart: unless-stopped
     ports:

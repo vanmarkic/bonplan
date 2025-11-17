@@ -36,44 +36,44 @@
     "npm": ">=10.0.0"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "express-session": "^1.18.0",
-    "connect-redis": "^7.1.1",
-    "helmet": "^7.1.0",
-    "express-rate-limit": "^7.2.0",
-    "csurf": "^1.11.0",
     "argon2": "^0.31.2",
-    "mysql2": "^3.9.7",
-    "ioredis": "^5.3.2",
-    "ejs": "^3.1.10",
-    "dotenv": "^16.4.5",
-    "winston": "^3.13.0",
     "compression": "^1.7.4",
+    "connect-redis": "^7.1.1",
     "cors": "^2.8.5",
-    "isomorphic-dompurify": "^2.12.0",
-    "validator": "^13.12.0",
+    "csurf": "^1.11.0",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0",
+    "express-session": "^1.18.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
     "i18n": "^0.15.1",
+    "ioredis": "^5.3.2",
+    "isomorphic-dompurify": "^2.12.0",
+    "mysql2": "^3.9.7",
     "node-cron": "^3.0.3",
-    "express-validator": "^7.0.1"
+    "validator": "^13.12.0",
+    "winston": "^3.13.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0",
-    "jest": "^29.7.0",
-    "supertest": "^7.0.0",
+    "@types/node": "^20.14.2",
+    "autoprefixer": "^10.4.19",
+    "cssnano": "^7.0.1",
+    "esbuild": "^0.27.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-security": "^3.0.0",
-    "prettier": "^3.2.5",
     "husky": "^9.0.11",
+    "jest": "^29.7.0",
     "lint-staged": "^15.2.2",
-    "pa11y-ci": "^3.1.0",
+    "nodemon": "^3.1.0",
+    "pa11y-ci": "^4.0.1",
     "postcss": "^8.4.38",
     "postcss-cli": "^11.0.0",
-    "autoprefixer": "^10.4.19",
-    "cssnano": "^7.0.1",
-    "esbuild": "^0.21.5",
-    "@types/node": "^20.14.2"
+    "prettier": "^3.2.5",
+    "supertest": "^7.0.0"
   },
   "jest": {
     "testEnvironment": "node",
@@ -89,12 +89,18 @@
   },
   "eslintConfig": {
     "extends": [
-      "airbnb-base",
-      "plugin:security/recommended"
+      "airbnb-base"
     ],
+    "plugins": [
+      "security"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2021
+    },
     "env": {
       "node": true,
-      "jest": true
+      "jest": true,
+      "browser": true
     },
     "rules": {
       "no-console": "error",
@@ -107,7 +113,19 @@
       "comma-dangle": [
         "error",
         "never"
-      ]
+      ],
+      "security/detect-object-injection": "off",
+      "security/detect-non-literal-regexp": "warn",
+      "security/detect-unsafe-regex": "error",
+      "security/detect-buffer-noassert": "error",
+      "security/detect-child-process": "error",
+      "security/detect-disable-mustache-escape": "error",
+      "security/detect-eval-with-expression": "error",
+      "security/detect-no-csrf-before-method-override": "error",
+      "security/detect-non-literal-fs-filename": "warn",
+      "security/detect-non-literal-require": "warn",
+      "security/detect-possible-timing-attacks": "warn",
+      "security/detect-pseudoRandomBytes": "error"
     }
   },
   "prettier": {

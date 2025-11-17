@@ -51,6 +51,7 @@ app.use(sessionMiddleware);
 
 // CSRF Protection
 const csrfProtection = require('./middleware/csrf')();
+
 app.use(csrfProtection.generate);
 app.use(csrfProtection.verify);
 

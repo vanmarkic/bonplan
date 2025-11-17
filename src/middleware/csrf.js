@@ -45,7 +45,7 @@ function csrfProtection(options = {}) {
       }
 
       // Skip specified paths
-      if (skipPaths.some(path => req.path.startsWith(path))) {
+      if (skipPaths.some((path) => req.path.startsWith(path))) {
         return next();
       }
 
@@ -68,9 +68,9 @@ function csrfProtection(options = {}) {
       }
 
       // Check token from body, query, or header
-      const requestToken = req.body[paramKey] ||
-                          req.query[paramKey] ||
-                          req.get(headerKey);
+      const requestToken = req.body[paramKey]
+                          || req.query[paramKey]
+                          || req.get(headerKey);
 
       if (!requestToken || requestToken !== sessionToken) {
         logger.warn('CSRF token mismatch', {
