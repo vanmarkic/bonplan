@@ -13,7 +13,7 @@ function requireAuth(req, res, next) {
   if (!req.session || !req.session.user) {
     logger.warn('Unauthorized access attempt', {
       path: req.path,
-      ip: req.ip
+      anonId: req.anonId
     });
 
     // Preserve the original URL for redirect after login

@@ -48,6 +48,7 @@ Thumbs.db
 # Temporary files
 temp/
 tmp/
+.temp/
 *.tmp
 
 # Security

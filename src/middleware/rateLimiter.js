@@ -28,7 +28,7 @@ function createRateLimiter(options = {}) {
     windowMs = 60000,       // Time window in milliseconds (default: 1 minute)
     max = 5,                // Max requests per window
     message = 'Trop de requêtes, veuillez réessayer plus tard',
-    keyGenerator = (req) => `${req.session?.user?.pseudo || req.ip}`,
+    keyGenerator = (req) => `${req.session?.user?.pseudo || req.anonId || 'unknown'}`,
     skipSuccessfulRequests = false
   } = options;
 

@@ -53,7 +53,7 @@ function csrfProtection(options = {}) {
       if (!sessionToken) {
         logger.warn('CSRF token missing in session', {
           path: req.path,
-          ip: req.ip
+          anonId: req.anonId
         });
 
         return res.status(403).render('error', {
@@ -75,7 +75,7 @@ function csrfProtection(options = {}) {
       if (!requestToken || requestToken !== sessionToken) {
         logger.warn('CSRF token mismatch', {
           path: req.path,
-          ip: req.ip,
+          anonId: req.anonId,
           user: req.session?.user?.pseudo
         });
 

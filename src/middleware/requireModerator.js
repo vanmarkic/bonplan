@@ -13,7 +13,7 @@ function requireModerator(req, res, next) {
   if (!req.session || !req.session.user) {
     logger.warn('Unauthenticated moderator access attempt', {
       path: req.path,
-      ip: req.ip
+      anonId: req.anonId
     });
 
     const returnUrl = encodeURIComponent(req.originalUrl);
@@ -25,7 +25,7 @@ function requireModerator(req, res, next) {
     logger.warn('Unauthorized moderator access attempt', {
       path: req.path,
       user: req.session.user.pseudo,
-      ip: req.ip
+      anonId: req.anonId
     });
 
     return res.status(403).render('error', {

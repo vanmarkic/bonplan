@@ -1,0 +1,29 @@
+# Robots.txt for Le Syndicat des Tox
+# Anonymous peer support forum - Respecting user privacy
+
+User-agent: *
+
+# Allow access to public pages
+Allow: /
+Allow: /auth/register
+Allow: /auth/login
+Allow: /forum
+
+# Disallow sensitive areas
+Disallow: /admin
+Disallow: /api
+Disallow: /settings
+Disallow: /reports
+
+# Disallow search engines from indexing user profiles
+Disallow: /user/*
+
+# Prevent session/token crawling
+Disallow: /*?session=*
+Disallow: /*?token=*
+
+# Sitemap (to be created)
+# Sitemap: https://syndicate-tox.be/sitemap.xml
+
+# Crawl delay to respect server resources
+Crawl-delay: 10

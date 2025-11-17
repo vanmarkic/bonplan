@@ -1,0 +1,67 @@
+# ============================================
+# Le Syndicat des Tox - Docker Ignore
+# ============================================
+
+# Node modules (will be installed in container)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Configuration
+config/app.config.js
+!config/app.config.example.js
+
+# Logs
+logs/
+*.log
+
+# Test files
+tests/
+coverage/
+.nyc_output/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# Scripts (not needed in container)
+scripts/
+
+# Deployment configs (not needed in container)
+deployment/
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore

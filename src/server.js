@@ -10,6 +10,7 @@ require('dotenv').config();
 const logger = require('./utils/logger');
 const db = require('./utils/database');
 const redis = require('./utils/redis');
+const i18n = require('./utils/i18n');
 
 // Middleware
 const securityMiddleware = require('./middleware/security');
@@ -36,6 +37,9 @@ app.set('view engine', 'ejs');
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
+// i18n middleware
+app.use(i18n.init);
+
 // Security headers and CSP
 app.use(securityMiddleware);
 
@@ -46,8 +50,9 @@ app.use(anonymizeMiddleware);
 app.use(sessionMiddleware);
 
 // CSRF Protection
-const csrfMiddleware = require('./middleware/csrf');
-app.use(csrfMiddleware);
+const csrfProtection = require('./middleware/csrf')();
+app.use(csrfProtection.generate);
+app.use(csrfProtection.verify);
 
 // Static files
 app.use('/public', express.static(path.join(__dirname, '../public'), {
