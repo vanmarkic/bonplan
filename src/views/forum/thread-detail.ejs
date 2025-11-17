@@ -2,39 +2,39 @@
 
 <!-- Breadcrumb navigation -->
 <div style="margin-bottom: 1.5rem;">
-    <a href="/forum/threads" style="color: #3498db; text-decoration: none;">← Retour aux discussions</a>
+    <a href="/forum/threads" style="color: #3498db; text-decoration: none;">← <%= t('pagination.previous') %></a>
 </div>
 
 <!-- Thread content -->
 <article style="margin-bottom: 2rem;">
     <% if (thread.isPinned) { %>
         <div class="alert alert-info" style="margin-bottom: 1rem;">
-            📌 Cette discussion est épinglée par les modérateurs
+            📌 <%= t('forum.isPinned') %>
         </div>
     <% } %>
 
     <% if (thread.isLocked) { %>
         <div class="alert alert-warning" style="margin-bottom: 1rem;">
-            🔒 Cette discussion est verrouillée. Aucune nouvelle réponse ne peut être ajoutée.
+            🔒 <%= t('forum.threadLocked') %>
         </div>
     <% } %>
 
     <h1 style="font-size: 1.75rem; margin-bottom: 1rem;"><%= thread.title %></h1>
 
     <div class="thread-meta" style="margin-bottom: 1.5rem;">
-        <span>Par <strong><%= thread.author || '[supprimé]' %></strong></span>
+        <span><%= t('forum.author') %>: <strong><%= thread.author || t('forum.deleted') %></strong></span>
         <% if (thread.isModerator) { %>
-            <span class="moderator-badge">🛡️ Modérateur</span>
+            <span class="moderator-badge">🛡️ <%= t('moderation.moderator') %></span>
         <% } %>
         <span> • <%= thread.createdAt %></span>
         <% if (thread.isEdited) { %>
-            <span> • (modifié)</span>
+            <span> • (<%= t('forum.edited') %>)</span>
         <% } %>
     </div>
 
     <div style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.5rem;">
         <% if (thread.isDeleted) { %>
-            <p class="deleted-content">[Message supprimé]</p>
+            <p class="deleted-content"><%= t('forum.deleted') %></p>
         <% } else { %>
             <%- thread.content.replace(/\n/g, '<br>') %>
         <% } %>
@@ -62,39 +62,39 @@
 
             <% if (user.id !== thread.authorId) { %>
                 <button onclick="document.getElementById('report-form').style.display='block'" class="btn btn-warning">
-                    ⚠️ Signaler
+                    ⚠️ <%= t('moderation.report') %>
                 </button>
             <% } %>
 
             <% if (user.isModerator) { %>
                 <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #e74c3c;">
-                    <strong style="color: #e74c3c;">Actions de modération:</strong>
+                    <strong style="color: #e74c3c;"><%= t('moderation.moderator') %>:</strong>
                     <div style="margin-top: 0.5rem;">
                         <% if (!thread.isPinned) { %>
-                            <button onclick="if(confirm('Épingler cette discussion?')) { moderateThread('pin'); }" class="btn btn-secondary">
-                                📌 Épingler
+                            <button onclick="if(confirm('<%= t('moderation.pin') %>?')) { moderateThread('pin'); }" class="btn btn-secondary">
+                                📌 <%= t('moderation.pin') %>
                             </button>
                         <% } else { %>
-                            <button onclick="if(confirm('Désépingler cette discussion?')) { moderateThread('unpin'); }" class="btn btn-secondary">
-                                📌 Désépingler
+                            <button onclick="if(confirm('<%= t('moderation.unpin') %>?')) { moderateThread('unpin'); }" class="btn btn-secondary">
+                                📌 <%= t('moderation.unpin') %>
                             </button>
                         <% } %>
                         <% if (!thread.isLocked) { %>
-                            <button onclick="if(confirm('Verrouiller cette discussion?')) { moderateThread('lock'); }" class="btn btn-warning">
-                                🔒 Verrouiller
+                            <button onclick="if(confirm('<%= t('moderation.lock') %>?')) { moderateThread('lock'); }" class="btn btn-warning">
+                                🔒 <%= t('moderation.lock') %>
                             </button>
                         <% } else { %>
-                            <button onclick="if(confirm('Déverrouiller cette discussion?')) { moderateThread('unlock'); }" class="btn btn-warning">
-                                🔓 Déverrouiller
+                            <button onclick="if(confirm('<%= t('moderation.unlock') %>?')) { moderateThread('unlock'); }" class="btn btn-warning">
+                                🔓 <%= t('moderation.unlock') %>
                             </button>
                         <% } %>
                         <% if (!thread.isHidden) { %>
-                            <button onclick="if(confirm('Masquer cette discussion?')) { moderateThread('hide'); }" class="btn btn-danger">
-                                👁️ Masquer
+                            <button onclick="if(confirm('<%= t('moderation.hide') %>?')) { moderateThread('hide'); }" class="btn btn-danger">
+                                👁️ <%= t('moderation.hide') %>
                             </button>
                         <% } else { %>
-                            <button onclick="if(confirm('Afficher cette discussion?')) { moderateThread('show'); }" class="btn btn-secondary">
-                                👁️ Afficher
+                            <button onclick="if(confirm('<%= t('moderation.unhide') %>?')) { moderateThread('show'); }" class="btn btn-secondary">
+                                👁️ <%= t('moderation.unhide') %>
                             </button>
                         <% } %>
                     </div>
@@ -118,25 +118,25 @@
 
         <!-- Report form (hidden by default) -->
         <div id="report-form" class="report-form" style="display: none;">
-            <h3>Signaler ce contenu</h3>
+            <h3><%= t('moderation.reportContent') %></h3>
             <form method="POST" action="/forum/threads/<%= thread.id %>/report">
                 <div class="form-group">
-                    <label for="reason">Raison du signalement:</label>
+                    <label for="reason"><%= t('moderation.reportReason') %>:</label>
                     <select name="reason" id="reason" required>
-                        <option value="">-- Sélectionnez une raison --</option>
-                        <option value="spam">Spam</option>
-                        <option value="inappropriate">Contenu inapproprié</option>
-                        <option value="harassment">Harcèlement</option>
-                        <option value="misinformation">Désinformation dangereuse</option>
-                        <option value="other">Autre</option>
+                        <option value=""><%= t('validation.required') %></option>
+                        <option value="spam"><%= t('moderation.reason.spam') %></option>
+                        <option value="harmful"><%= t('moderation.reason.harmful') %></option>
+                        <option value="sourcing"><%= t('moderation.reason.sourcing') %></option>
+                        <option value="personal_attack"><%= t('moderation.reason.personal_attack') %></option>
+                        <option value="other"><%= t('moderation.reason.other') %></option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="details">Détails (optionnel):</label>
+                    <label for="details"><%= t('moderation.reportDescription') %>:</label>
                     <textarea name="details" id="details" rows="3" maxlength="500"></textarea>
                 </div>
-                <button type="submit" class="btn btn-warning">Envoyer le signalement</button>
-                <button type="button" onclick="document.getElementById('report-form').style.display='none'" class="btn btn-secondary">Annuler</button>
+                <button type="submit" class="btn btn-warning"><%= t('actions.submit') %></button>
+                <button type="button" onclick="document.getElementById('report-form').style.display='none'" class="btn btn-secondary"><%= t('actions.cancel') %></button>
             </form>
         </div>
     <% } %>
@@ -146,25 +146,25 @@
 
 <!-- Replies section -->
 <section>
-    <h2 style="margin-bottom: 1.5rem;">Réponses (<%= replies ? replies.length : 0 %>)</h2>
+    <h2 style="margin-bottom: 1.5rem;"><%= t('forum.replies') %> (<%= replies ? replies.length : 0 %>)</h2>
 
     <% if (replies && replies.length > 0) { %>
         <% replies.forEach(reply => { %>
             <div class="reply" id="reply-<%= reply.id %>">
                 <div class="thread-meta" style="margin-bottom: 0.75rem;">
-                    <strong><%= reply.author || '[supprimé]' %></strong>
+                    <strong><%= reply.author || t('forum.deleted') %></strong>
                     <% if (reply.isModerator) { %>
-                        <span class="moderator-badge">🛡️ Modérateur</span>
+                        <span class="moderator-badge">🛡️ <%= t('moderation.moderator') %></span>
                     <% } %>
                     <span> • <%= reply.createdAt %></span>
                     <% if (reply.isEdited) { %>
-                        <span> • (modifié)</span>
+                        <span> • (<%= t('forum.edited') %>)</span>
                     <% } %>
                 </div>
 
                 <div style="line-height: 1.6;">
                     <% if (reply.isDeleted) { %>
-                        <p class="deleted-content">[Message supprimé]</p>
+                        <p class="deleted-content"><%= t('forum.deleted') %></p>
                     <% } else { %>
                         <%- reply.content.replace(/\n/g, '<br>') %>
                     <% } %>
@@ -174,25 +174,25 @@
                     <div style="margin-top: 0.75rem;">
                         <% if (user.id === reply.authorId && reply.canEdit) { %>
                             <button onclick="editReply('<%= reply.id %>')" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
-                                ✏️ Modifier
+                                ✏️ <%= t('actions.edit') %>
                             </button>
                             <% if (reply.editTimeRemaining) { %>
                                 <span class="edit-timer" style="font-size: 0.75rem;">
-                                    <%= reply.editTimeRemaining %> restantes
+                                    <%= reply.editTimeRemaining %>
                                 </span>
                             <% } %>
-                            <button onclick="if(confirm('Supprimer cette réponse?')) { deleteReply('<%= reply.id %>'); }" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
-                                🗑️ Supprimer
+                            <button onclick="if(confirm('<%= t('forum.confirmDelete') %>?')) { deleteReply('<%= reply.id %>'); }" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                🗑️ <%= t('actions.delete') %>
                             </button>
                         <% } %>
                         <% if (user.id !== reply.authorId) { %>
                             <button onclick="reportReply('<%= reply.id %>')" class="btn btn-warning" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
-                                ⚠️ Signaler
+                                ⚠️ <%= t('moderation.report') %>
                             </button>
                         <% } %>
                         <% if (user.isModerator && !reply.isDeleted) { %>
-                            <button onclick="if(confirm('Masquer cette réponse?')) { moderateReply('<%= reply.id %>', 'hide'); }" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
-                                👁️ Masquer
+                            <button onclick="if(confirm('<%= t('moderation.hide') %>?')) { moderateReply('<%= reply.id %>', 'hide'); }" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                👁️ <%= t('moderation.hide') %>
                             </button>
                         <% } %>
                     </div>
@@ -200,28 +200,28 @@
             </div>
         <% }); %>
     <% } else { %>
-        <p style="color: #7f8c8d; text-align: center; padding: 2rem;">Aucune réponse pour le moment. Soyez le premier à répondre!</p>
+        <p style="color: #7f8c8d; text-align: center; padding: 2rem;"><%= t('forum.noReplies') %></p>
     <% } %>
 
     <!-- Reply form -->
     <% if (typeof user !== 'undefined' && user && !thread.isLocked) { %>
         <div class="reply-form" style="margin-top: 2rem;">
-            <h3>Ajouter une réponse</h3>
+            <h3><%= t('forum.newReply') %></h3>
             <form method="POST" action="/forum/threads/<%= thread.id %>/replies">
                 <div class="form-group">
-                    <label for="content">Votre message:</label>
+                    <label for="content"><%= t('forum.body') %>:</label>
                     <textarea name="content" id="content" required minlength="10" maxlength="5000" onkeyup="updateCharCount(this)"></textarea>
                     <div class="char-counter">
-                        <span id="char-count">0</span> / 5000 caractères
+                        <span id="char-count">0</span> / 5000
                     </div>
                 </div>
-                <button type="submit" class="btn">Publier la réponse</button>
+                <button type="submit" class="btn"><%= t('forum.postReply') %></button>
             </form>
         </div>
     <% } else if (!user) { %>
         <div class="alert alert-info" style="margin-top: 2rem;">
-            <p><strong>Participez à la discussion!</strong></p>
-            <p><a href="/auth/login">Connectez-vous</a> ou <a href="/auth/register">créez un compte anonyme</a> pour répondre.</p>
+            <p><strong><%= t('community.peerSupport') %></strong></p>
+            <p><a href="/auth/login"><%= t('nav.login') %></a> <%= t('nav.register').toLowerCase() %> <a href="/auth/register"><%= t('auth.anonymousAccount') %></a></p>
         </div>
     <% } %>
 </section>

@@ -1,0 +1,149 @@
+<%- include('../partials/header', { title: 'Exporter mes données - Le Syndicat des Tox' }) %>
+
+<h2>Exporter mes données</h2>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <%= error %>
+    </div>
+<% } %>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+        <%= success %>
+    </div>
+<% } %>
+
+<div style="max-width: 800px;">
+    <!-- GDPR Notice -->
+    <section style="margin-bottom: 2rem;">
+        <div class="alert alert-info">
+            <p><strong>📋 Droit à la portabilité des données (RGPD)</strong></p>
+            <p style="margin-top: 0.5rem;">
+                Conformément au Règlement Général sur la Protection des Données (RGPD), vous avez le droit d'obtenir une copie de toutes les données que nous conservons à votre sujet.
+            </p>
+        </div>
+    </section>
+
+    <!-- What's Included -->
+    <section style="margin-bottom: 2rem;">
+        <h3>Que contient l'export?</h3>
+        <p>Votre export de données comprendra:</p>
+        <ul style="margin-top: 1rem;">
+            <li><strong>Informations de compte:</strong> pseudo, date de création, langue préférée, statut modérateur</li>
+            <li><strong>Vos discussions:</strong> tous les fils de discussion que vous avez créés (titre, contenu, date, langue)</li>
+            <li><strong>Vos réponses:</strong> toutes vos réponses dans les discussions (contenu, date, fil associé)</li>
+            <li><strong>Métadonnées:</strong> nombre de vues, dates de modification</li>
+        </ul>
+    </section>
+
+    <!-- What's NOT Included -->
+    <section style="margin-bottom: 2rem;">
+        <h3>Ce qui n'est PAS inclus</h3>
+        <p>Pour protéger votre anonymat, les éléments suivants ne sont jamais collectés et ne peuvent donc pas être exportés:</p>
+        <ul style="margin-top: 1rem;">
+            <li>❌ Adresse IP ou identifiants de connexion</li>
+            <li>❌ Informations de géolocalisation</li>
+            <li>❌ Votre code PIN (chiffré et non récupérable)</li>
+            <li>❌ Historique de navigation ou cookies de suivi</li>
+            <li>❌ Email ou numéro de téléphone (jamais demandés)</li>
+        </ul>
+    </section>
+
+    <!-- Export Format -->
+    <section style="margin-bottom: 2rem;">
+        <h3>Format de l'export</h3>
+        <p>Vos données seront exportées au format JSON, facile à lire et à traiter par la plupart des outils informatiques.</p>
+        <div style="background: #f9f9f9; padding: 1rem; border-radius: 4px; margin-top: 1rem; font-family: monospace; font-size: 0.875rem;">
+            <pre style="margin: 0; white-space: pre-wrap;">{
+  "user": {
+    "pseudo": "votre_pseudo",
+    "createdAt": "2025-01-15T10:30:00.000Z",
+    "preferredLanguage": "fr",
+    "isModerator": false
+  },
+  "threads": [...],
+  "replies": [...],
+  "exportDate": "2025-01-20T14:45:00.000Z"
+}</pre>
+        </div>
+    </section>
+
+    <!-- Export Actions -->
+    <section style="margin-bottom: 3rem;">
+        <h3>Télécharger mes données</h3>
+
+        <form method="POST" action="/forum/export" style="margin-top: 1.5rem;">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="confirm" required style="width: auto; margin-right: 0.5rem;">
+                    Je confirme vouloir télécharger une copie de toutes mes données
+                </label>
+            </div>
+
+            <button type="submit" class="btn">
+                📥 Télécharger mes données (JSON)
+            </button>
+        </form>
+
+        <div style="margin-top: 2rem; background: #fff3cd; padding: 1rem; border-radius: 4px; border: 1px solid #ffc107;">
+            <h4 style="color: #856404;">💡 Conseils de sécurité</h4>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #856404;">
+                <li>Le fichier exporté contient toutes vos publications. Protégez-le comme vous protégeriez votre compte.</li>
+                <li>Ne partagez pas ce fichier avec des personnes non autorisées</li>
+                <li>Supprimez le fichier une fois que vous n'en avez plus besoin</li>
+                <li>L'export ne contient pas votre PIN et ne peut pas être utilisé pour accéder à votre compte</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Additional Options -->
+    <section style="margin-bottom: 3rem;">
+        <h3>Autres options</h3>
+        <div style="display: grid; gap: 1rem;">
+            <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 4px;">
+                <h4>⚙️ Paramètres du compte</h4>
+                <p class="text-small">Modifier votre langue, voir vos statistiques</p>
+                <a href="/forum/settings" class="btn btn-secondary" style="margin-top: 0.5rem;">
+                    Accéder aux paramètres
+                </a>
+            </div>
+
+            <div style="padding: 1rem; border: 1px solid #fcc; border-radius: 4px; background: #fee;">
+                <h4 style="color: #e74c3c;">🗑️ Supprimer mon compte</h4>
+                <p class="text-small">Suppression définitive de votre compte et de toutes vos données</p>
+                <a href="/forum/delete-account" class="btn btn-danger" style="margin-top: 0.5rem;">
+                    Supprimer mon compte
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- GDPR Rights Information -->
+    <section style="margin-bottom: 2rem;">
+        <h3>Vos droits RGPD</h3>
+        <p>En vertu du RGPD, vous disposez des droits suivants concernant vos données personnelles:</p>
+        <ul style="margin-top: 1rem;">
+            <li><strong>Droit d'accès:</strong> obtenir une copie de vos données (cette page)</li>
+            <li><strong>Droit de rectification:</strong> modifier vos discussions et réponses (pendant 15 minutes)</li>
+            <li><strong>Droit à l'effacement:</strong> supprimer votre compte et vos données</li>
+            <li><strong>Droit à la portabilité:</strong> recevoir vos données dans un format structuré (JSON)</li>
+            <li><strong>Droit d'opposition:</strong> vous pouvez cesser d'utiliser le service à tout moment</li>
+        </ul>
+
+        <div style="margin-top: 1.5rem; padding: 1rem; background: #ecf0f1; border-radius: 4px;">
+            <p class="text-small">
+                <strong>Note importante:</strong> Étant donné notre engagement envers l'anonymat absolu, nous ne collectons volontairement que le strict minimum de données nécessaires au fonctionnement du forum. Nous ne pouvons pas vous identifier au-delà de votre pseudo, et nous ne vendons ni ne partageons jamais vos données avec des tiers.
+            </p>
+        </div>
+    </section>
+
+    <!-- Back to Settings -->
+    <div style="margin-top: 2rem;">
+        <a href="/forum/settings" style="color: #3498db; text-decoration: none;">← Retour aux paramètres</a>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,224 @@
+<%- include('../partials/header', { title: 'Supprimer mon compte - Le Syndicat des Tox' }) %>
+
+<h2>Supprimer mon compte</h2>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <%= error %>
+    </div>
+<% } %>
+
+<div style="max-width: 800px;">
+    <!-- Warning Section -->
+    <section style="margin-bottom: 2rem;">
+        <div class="alert alert-error">
+            <h3 style="color: #c00; margin-top: 0;">⚠️ ATTENTION: Action irréversible</h3>
+            <p style="margin-top: 1rem;">
+                La suppression de votre compte est <strong>définitive et irréversible</strong>.
+                Une fois votre compte supprimé, il sera impossible de le récupérer.
+            </p>
+        </div>
+    </section>
+
+    <!-- What Will Be Deleted -->
+    <section style="margin-bottom: 2rem;">
+        <h3>Ce qui sera supprimé</h3>
+        <ul style="margin-top: 1rem;">
+            <li>🗑️ <strong>Votre compte</strong> (pseudo: <em><%= user.pseudo %></em>)</li>
+            <li>🗑️ <strong>Toutes vos discussions</strong> (tous les fils de discussion que vous avez créés)</li>
+            <li>🗑️ <strong>Toutes vos réponses</strong> (tous vos messages dans les discussions)</li>
+            <li>🗑️ <strong>Vos préférences</strong> (langue, paramètres)</li>
+            <li>🗑️ <strong>Votre historique</strong> (dates de création, modifications)</li>
+        </ul>
+
+        <div style="margin-top: 1.5rem; background: #fff3cd; padding: 1rem; border-radius: 4px; border: 1px solid #ffc107;">
+            <p style="color: #856404;">
+                <strong>Note:</strong> Les discussions et réponses seront entièrement supprimées de la base de données.
+                Contrairement à certaines plateformes qui les marquent simplement comme "supprimé",
+                vos contenus seront physiquement effacés de nos serveurs.
+            </p>
+        </div>
+    </section>
+
+    <!-- What Will NOT Be Deleted -->
+    <section style="margin-bottom: 2rem;">
+        <h3>Ce qui ne peut pas être supprimé (car jamais collecté)</h3>
+        <p>En raison de notre engagement envers l'anonymat, nous n'avons jamais collecté:</p>
+        <ul style="margin-top: 1rem;">
+            <li>❌ Adresse IP (anonymisée au niveau du serveur Nginx)</li>
+            <li>❌ Email (jamais demandé)</li>
+            <li>❌ Numéro de téléphone (jamais demandé)</li>
+            <li>❌ Informations de géolocalisation</li>
+            <li>❌ Cookies de suivi ou analytics</li>
+        </ul>
+    </section>
+
+    <!-- Alternative: Export Before Delete -->
+    <section style="margin-bottom: 2rem;">
+        <h3>💡 Avant de supprimer: exportez vos données</h3>
+        <p>Si vous souhaitez conserver une copie de vos discussions et réponses, vous pouvez les exporter avant de supprimer votre compte.</p>
+
+        <a href="/forum/export" class="btn btn-secondary" style="margin-top: 1rem;">
+            📥 Exporter mes données d'abord
+        </a>
+    </section>
+
+    <!-- Alternatives to Deletion -->
+    <section style="margin-bottom: 3rem;">
+        <h3>Alternatives à la suppression</h3>
+        <p>Si vous souhaitez simplement faire une pause, voici d'autres options:</p>
+
+        <div style="background: #f9f9f9; padding: 1.5rem; border-radius: 4px; margin-top: 1rem;">
+            <h4>🔒 Prendre une pause</h4>
+            <p class="text-small">Déconnectez-vous simplement. Votre compte restera intact et vous pourrez revenir quand vous le souhaitez.</p>
+            <a href="/auth/logout" class="btn btn-secondary" style="margin-top: 0.5rem;">
+                Se déconnecter
+            </a>
+        </div>
+
+        <div style="background: #f9f9f9; padding: 1.5rem; border-radius: 4px; margin-top: 1rem;">
+            <h4>🆘 Besoin d'aide?</h4>
+            <p class="text-small">Si vous traversez une période difficile, consultez nos ressources d'aide avant de partir.</p>
+            <a href="/forum/resources" class="btn btn-secondary" style="margin-top: 0.5rem;">
+                Ressources d'aide
+            </a>
+        </div>
+    </section>
+
+    <!-- Deletion Form -->
+    <section style="margin-bottom: 3rem;">
+        <h3>Confirmer la suppression</h3>
+        <p>Pour supprimer définitivement votre compte, vous devez:</p>
+        <ol style="margin-top: 1rem;">
+            <li>Taper exactement la phrase de confirmation ci-dessous</li>
+            <li>Saisir votre code PIN pour authentifier la demande</li>
+            <li>Confirmer votre décision</li>
+        </ol>
+
+        <form method="POST" action="/forum/delete-account" style="margin-top: 2rem;" onsubmit="return validateDeletion()">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+            <div class="form-group">
+                <label for="confirmation">Pour confirmer, tapez exactement: <strong>DELETE MY ACCOUNT</strong></label>
+                <input
+                    type="text"
+                    id="confirmation"
+                    name="confirmation"
+                    required
+                    placeholder="Tapez: DELETE MY ACCOUNT"
+                    autocomplete="off"
+                    style="font-family: monospace;"
+                >
+                <p class="text-small" style="color: #e74c3c;">
+                    Attention: la phrase doit être exactement identique (sensible à la casse)
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label for="pin">Votre code PIN (4 chiffres):</label>
+                <input
+                    type="password"
+                    id="pin"
+                    name="pin"
+                    required
+                    pattern="[0-9]{4}"
+                    maxlength="4"
+                    inputmode="numeric"
+                    autocomplete="off"
+                >
+                <p class="text-small">
+                    Requis pour authentifier la suppression de votre compte
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="understand" name="understand" required style="width: auto; margin-right: 0.5rem;">
+                    Je comprends que cette action est irréversible et que toutes mes données seront définitivement supprimées
+                </label>
+            </div>
+
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e74c3c;">
+                <button type="submit" class="btn btn-danger" id="delete-btn" disabled>
+                    🗑️ SUPPRIMER DÉFINITIVEMENT MON COMPTE
+                </button>
+                <a href="/forum/settings" class="btn btn-secondary" style="margin-left: 1rem;">
+                    ❌ Annuler - Retour aux paramètres
+                </a>
+            </div>
+        </form>
+    </section>
+
+    <!-- Support Resources -->
+    <section style="margin-bottom: 2rem;">
+        <div style="background: #e74c3c; color: #fff; padding: 1.5rem; border-radius: 4px;">
+            <h3 style="color: #fff; margin-top: 0;">🆘 Ressources de crise</h3>
+            <p>Si vous êtes en détresse, veuillez contacter:</p>
+            <ul style="margin-left: 1.5rem; margin-top: 1rem;">
+                <li><strong>Centre de Prévention du Suicide:</strong> 0800 32 123 (24/7, gratuit et anonyme)</li>
+                <li><strong>Zelfmoordlijn (NL):</strong> 1813 (24/7)</li>
+                <li><strong>Urgences:</strong> 112</li>
+                <li><strong>Druglijn:</strong> 078 15 10 20</li>
+                <li><strong>Infor-Drogues:</strong> 02 227 52 52</li>
+            </ul>
+            <a href="/forum/resources" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #fff; color: #e74c3c; text-decoration: none; border-radius: 4px; font-weight: 600;">
+                Voir toutes les ressources d'aide
+            </a>
+        </div>
+    </section>
+</div>
+
+<script>
+// Enable delete button only when confirmation is typed correctly
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmInput = document.getElementById('confirmation');
+    const understandCheckbox = document.getElementById('understand');
+    const deleteBtn = document.getElementById('delete-btn');
+
+    function checkEnableButton() {
+        const confirmValue = confirmInput.value;
+        const isChecked = understandCheckbox.checked;
+        const isExactMatch = confirmValue === 'DELETE MY ACCOUNT';
+
+        deleteBtn.disabled = !(isExactMatch && isChecked);
+
+        if (isExactMatch) {
+            confirmInput.style.borderColor = '#2ecc71';
+        } else if (confirmValue.length > 0) {
+            confirmInput.style.borderColor = '#e74c3c';
+        } else {
+            confirmInput.style.borderColor = '#ccc';
+        }
+    }
+
+    confirmInput.addEventListener('input', checkEnableButton);
+    understandCheckbox.addEventListener('change', checkEnableButton);
+});
+
+function validateDeletion() {
+    const confirmation = document.getElementById('confirmation').value;
+    const pin = document.getElementById('pin').value;
+
+    if (confirmation !== 'DELETE MY ACCOUNT') {
+        alert('La phrase de confirmation doit être exactement: DELETE MY ACCOUNT');
+        return false;
+    }
+
+    if (!/^[0-9]{4}$/.test(pin)) {
+        alert('Le code PIN doit être composé de 4 chiffres.');
+        return false;
+    }
+
+    const finalConfirm = confirm(
+        '⚠️ DERNIÈRE CONFIRMATION ⚠️\n\n' +
+        'Êtes-vous ABSOLUMENT certain de vouloir supprimer définitivement votre compte?\n\n' +
+        'Cette action est IRRÉVERSIBLE.\n\n' +
+        'Toutes vos discussions et réponses seront définitivement effacées.\n\n' +
+        'Cliquez sur OK pour confirmer la suppression, ou Annuler pour revenir en arrière.'
+    );
+
+    return finalConfirm;
+}
+</script>
+
+<%- include('../partials/footer') %>

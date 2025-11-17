@@ -334,21 +334,21 @@
 </head>
 <body>
     <div class="crisis-banner">
-        🆘 Besoin d'aide immédiate ? <a href="/about#crisis">Centre de Prévention du Suicide: 0800 32 123 (24/7)</a>
+        🆘 <%= t('resources.emergency') %> <a href="/about#crisis"><%= t('resources.crisis_line_suicide') %>: <%= t('resources.crisis_line_suicide_number') %> (<%= t('resources.crisis_line_suicide_hours') %>)</a>
     </div>
 
     <header>
         <div class="container">
-            <h1>🤝 Le Syndicat des Tox</h1>
+            <h1>🤝 <%= t('app.name') %></h1>
             <nav>
-                <a href="/">Accueil</a>
-                <a href="/about">À propos</a>
+                <a href="/"><%= t('nav.home') %></a>
+                <a href="/about"><%= t('resources.title') %></a>
                 <% if (typeof user !== 'undefined' && user) { %>
-                    <span style="color: #95a5a6;">Connecté: <%= user.pseudo %></span>
-                    <a href="/auth/logout">Déconnexion</a>
+                    <span style="color: #95a5a6;"><%= t('auth.welcomeBack', { pseudo: user.pseudo }) %></span>
+                    <a href="/auth/logout"><%= t('nav.logout') %></a>
                 <% } else { %>
-                    <a href="/auth/login">Connexion</a>
-                    <a href="/auth/register">Inscription</a>
+                    <a href="/auth/login"><%= t('nav.login') %></a>
+                    <a href="/auth/register"><%= t('nav.register') %></a>
                 <% } %>
             </nav>
         </div>

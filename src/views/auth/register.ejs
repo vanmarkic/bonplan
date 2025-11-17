@@ -1,6 +1,6 @@
 <%- include('../partials/header') %>
 
-<h2>Créer un compte anonyme</h2>
+<h2><%= t('auth.register') %></h2>
 
 <% if (typeof error !== 'undefined' && error) { %>
 <div class="alert alert-error">
@@ -10,18 +10,18 @@
 
 <div style="max-width: 500px;">
     <div class="alert alert-info">
-        <strong>⚠️ Important :</strong>
+        <strong><%= t('auth.welcomeNew') %></strong>
         <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
-            <li>Aucun email n'est demandé</li>
-            <li>Choisissez un pseudo unique et un code PIN à 4 chiffres</li>
-            <li><strong>Si vous oubliez votre PIN, votre compte sera perdu définitivement</strong></li>
-            <li>Notez votre PIN dans un endroit sûr</li>
+            <li><%= t('auth.noEmail') %></li>
+            <li><%= t('auth.choosePseudo') %></li>
+            <li><strong><%= t('auth.rememberPIN') %></strong></li>
+            <li><%= t('auth.neverShared') %></li>
         </ul>
     </div>
 
     <form method="POST" action="/auth/register">
         <div class="form-group">
-            <label for="pseudo">Pseudo (3-20 caractères) *</label>
+            <label for="pseudo"><%= t('auth.pseudoPlaceholder') %></label>
             <input
                 type="text"
                 id="pseudo"
@@ -33,11 +33,11 @@
                 value="<%= typeof pseudo !== 'undefined' ? pseudo : '' %>"
                 autocomplete="off"
             >
-            <p class="text-small">Lettres, chiffres, tirets et underscores seulement</p>
+            <p class="text-small"><%= t('validation.pseudoFormat') %></p>
         </div>
 
         <div class="form-group">
-            <label for="pin">Code PIN (4 chiffres) *</label>
+            <label for="pin"><%= t('auth.setPIN') %></label>
             <input
                 type="password"
                 id="pin"
@@ -48,21 +48,21 @@
                 inputmode="numeric"
                 autocomplete="off"
             >
-            <p class="text-small">4 chiffres (ex: 1234). ⚠️ Notez-le bien, impossible à récupérer !</p>
+            <p class="text-small"><%= t('auth.rememberPIN') %></p>
         </div>
 
         <div class="form-group">
-            <label for="language">Langue préférée</label>
+            <label for="language"><%= t('settings.language') %></label>
             <select id="language" name="language">
-                <option value="fr" <%= typeof language !== 'undefined' && language === 'fr' ? 'selected' : '' %>>Français</option>
-                <option value="nl" <%= typeof language !== 'undefined' && language === 'nl' ? 'selected' : '' %>>Nederlands</option>
-                <option value="de" <%= typeof language !== 'undefined' && language === 'de' ? 'selected' : '' %>>Deutsch</option>
-                <option value="en" <%= typeof language !== 'undefined' && language === 'en' ? 'selected' : '' %>>English</option>
+                <option value="fr" <%= typeof language !== 'undefined' && language === 'fr' ? 'selected' : '' %>><%= t('languages.fr') %></option>
+                <option value="nl" <%= typeof language !== 'undefined' && language === 'nl' ? 'selected' : '' %>><%= t('languages.nl') %></option>
+                <option value="de" <%= typeof language !== 'undefined' && language === 'de' ? 'selected' : '' %>><%= t('languages.de') %></option>
+                <option value="en" <%= typeof language !== 'undefined' && language === 'en' ? 'selected' : '' %>><%= t('languages.en') %></option>
             </select>
         </div>
 
-        <button type="submit" class="btn">Créer mon compte</button>
-        <a href="/auth/login" class="btn btn-secondary" style="margin-left: 1rem;">J'ai déjà un compte</a>
+        <button type="submit" class="btn"><%= t('auth.register') %></button>
+        <a href="/auth/login" class="btn btn-secondary" style="margin-left: 1rem;"><%= t('nav.login') %></a>
     </form>
 </div>
 

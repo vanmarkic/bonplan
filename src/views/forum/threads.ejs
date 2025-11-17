@@ -1,22 +1,22 @@
 <%- include('../partials/header', { title: 'Discussions - Le Syndicat des Tox' }) %>
 
-<h2>Discussions</h2>
+<h2><%= t('forum.threads') %></h2>
 
 <!-- Toolbar with new thread button and sorting options -->
 <div class="toolbar">
     <% if (typeof user !== 'undefined' && user) { %>
-        <a href="/forum/threads/new" class="btn">✍️ Nouvelle discussion</a>
+        <a href="/forum/threads/new" class="btn">✍️ <%= t('forum.newThread') %></a>
     <% } else { %>
         <div>
-            <a href="/auth/login" class="btn btn-secondary">Connectez-vous pour participer</a>
+            <a href="/auth/login" class="btn btn-secondary"><%= t('nav.login') %></a>
         </div>
     <% } %>
 
     <div class="sort-options">
-        <span style="margin-right: 0.5rem; color: #7f8c8d;">Trier par:</span>
-        <a href="/forum/threads?sort=recent" class="<%= sort === 'recent' ? 'active' : '' %>">Récents</a>
-        <a href="/forum/threads?sort=newest" class="<%= sort === 'newest' ? 'active' : '' %>">Plus récents</a>
-        <a href="/forum/threads?sort=replies" class="<%= sort === 'replies' ? 'active' : '' %>">Plus de réponses</a>
+        <span style="margin-right: 0.5rem; color: #7f8c8d;"><%= t('forum.sortBy') %>:</span>
+        <a href="/forum/threads?sort=recent" class="<%= sort === 'recent' ? 'active' : '' %>"><%= t('forum.sortActivity') %></a>
+        <a href="/forum/threads?sort=newest" class="<%= sort === 'newest' ? 'active' : '' %>"><%= t('forum.sortNewest') %></a>
+        <a href="/forum/threads?sort=replies" class="<%= sort === 'replies' ? 'active' : '' %>"><%= t('forum.sortReplies') %></a>
     </div>
 </div>
 
@@ -32,12 +32,12 @@
                 </div>
 
                 <div class="thread-meta">
-                    <span>Par <%= thread.author || '[supprimé]' %></span>
+                    <span><%= t('forum.author') %>: <%= thread.author || t('forum.deleted') %></span>
                     <% if (thread.isModerator) { %>
-                        <span class="moderator-badge">🛡️ Modérateur</span>
+                        <span class="moderator-badge">🛡️ <%= t('moderation.moderator') %></span>
                     <% } %>
-                    <span> • <%= thread.replyCount || 0 %> réponse<%= thread.replyCount !== 1 ? 's' : '' %></span>
-                    <span> • Dernière activité: <%= thread.lastActivity || thread.createdAt %></span>
+                    <span> • <%= thread.replyCount || 0 %> <%= thread.replyCount !== 1 ? t('forum.replies').toLowerCase() : t('forum.reply').toLowerCase() %></span>
+                    <span> • <%= t('forum.lastActivity') %>: <%= thread.lastActivity || thread.createdAt %></span>
                 </div>
 
                 <% if (thread.excerpt) { %>
@@ -50,10 +50,10 @@
     <% } else { %>
         <div class="no-results">
             <p style="font-size: 3rem; margin-bottom: 1rem;">🤷</p>
-            <h3>Aucune discussion pour le moment</h3>
-            <p>Soyez le premier à lancer une conversation!</p>
+            <h3><%= t('forum.noThreads') %></h3>
+            <p><%= t('community.welcome') %></p>
             <% if (typeof user !== 'undefined' && user) { %>
-                <a href="/forum/threads/new" class="btn" style="margin-top: 1rem;">Créer la première discussion</a>
+                <a href="/forum/threads/new" class="btn" style="margin-top: 1rem;"><%= t('forum.createThread') %></a>
             <% } %>
         </div>
     <% } %>
@@ -63,8 +63,8 @@
 <% if (totalPages && totalPages > 1) { %>
     <div class="pagination">
         <% if (currentPage > 1) { %>
-            <a href="/forum/threads?page=1&sort=<%= sort %>">« Début</a>
-            <a href="/forum/threads?page=<%= currentPage - 1 %>&sort=<%= sort %>">‹ Précédent</a>
+            <a href="/forum/threads?page=1&sort=<%= sort %>">«</a>
+            <a href="/forum/threads?page=<%= currentPage - 1 %>&sort=<%= sort %>">‹ <%= t('pagination.previous') %></a>
         <% } %>
 
         <% for(let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
@@ -76,14 +76,14 @@
         <% } %>
 
         <% if (currentPage < totalPages) { %>
-            <a href="/forum/threads?page=<%= currentPage + 1 %>&sort=<%= sort %>">Suivant ›</a>
-            <a href="/forum/threads?page=<%= totalPages %>&sort=<%= sort %>">Fin »</a>
+            <a href="/forum/threads?page=<%= currentPage + 1 %>&sort=<%= sort %>"><%= t('pagination.next') %> ›</a>
+            <a href="/forum/threads?page=<%= totalPages %>&sort=<%= sort %>">»</a>
         <% } %>
     </div>
 <% } %>
 
 <div class="alert alert-info" style="margin-top: 2rem;">
-    <strong>💡 Rappel:</strong> Ce forum est un espace bienveillant. Respectez les autres membres et leurs expériences. La réduction des risques et le soutien mutuel sont nos valeurs fondamentales.
+    <strong><%= t('community.guidelines') %>:</strong> <%= t('community.safeSpace') %>. <%= t('community.respectful') %>. <%= t('community.harmReduction') %>.
 </div>
 
 <%- include('../partials/footer') %>

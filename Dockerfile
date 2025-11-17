@@ -66,6 +66,7 @@ COPY --chown=nodejs:nodejs src ./src
 COPY --chown=nodejs:nodejs views ./views
 COPY --chown=nodejs:nodejs public ./public
 COPY --chown=nodejs:nodejs config ./config
+COPY --chown=nodejs:nodejs locales ./locales
 
 # Create logs directory
 RUN mkdir -p logs && chown -R nodejs:nodejs logs

@@ -1,0 +1,160 @@
+<%- include('../partials/header', { title: 'Paramètres - Le Syndicat des Tox' }) %>
+
+<h2>Paramètres du compte</h2>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <%= error %>
+    </div>
+<% } %>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+        <%= success %>
+    </div>
+<% } %>
+
+<div style="max-width: 800px;">
+    <!-- Account Information Section -->
+    <section style="margin-bottom: 3rem;">
+        <h3>Informations du compte</h3>
+        <div style="background: #f9f9f9; padding: 1.5rem; border-radius: 4px; margin-top: 1rem;">
+            <p><strong>Pseudo:</strong> <%= user.pseudo %></p>
+            <p><strong>Membre depuis:</strong> <%= new Date(user.createdAt).toLocaleDateString('fr-BE', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+            <p><strong>Langue préférée:</strong>
+                <% if (user.preferredLanguage === 'fr') { %>Français
+                <% } else if (user.preferredLanguage === 'nl') { %>Nederlands
+                <% } else if (user.preferredLanguage === 'de') { %>Deutsch
+                <% } else if (user.preferredLanguage === 'en') { %>English
+                <% } %>
+            </p>
+            <% if (user.isModerator) { %>
+                <p class="moderator-badge">🛡️ Modérateur</p>
+            <% } %>
+        </div>
+    </section>
+
+    <!-- Language Settings Section -->
+    <section style="margin-bottom: 3rem;">
+        <h3>Préférences</h3>
+        <form method="POST" action="/forum/settings/language">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+            <div class="form-group">
+                <label for="language">Langue de l'interface:</label>
+                <select id="language" name="language">
+                    <option value="fr" <%= user.preferredLanguage === 'fr' ? 'selected' : '' %>>Français</option>
+                    <option value="nl" <%= user.preferredLanguage === 'nl' ? 'selected' : '' %>>Nederlands</option>
+                    <option value="de" <%= user.preferredLanguage === 'de' ? 'selected' : '' %>>Deutsch</option>
+                    <option value="en" <%= user.preferredLanguage === 'en' ? 'selected' : '' %>>English</option>
+                </select>
+                <p class="text-small">La langue utilisée pour les menus et les messages du forum</p>
+            </div>
+
+            <button type="submit" class="btn">
+                💾 Enregistrer les préférences
+            </button>
+        </form>
+    </section>
+
+    <!-- Privacy & Data Section -->
+    <section style="margin-bottom: 3rem;">
+        <h3>Confidentialité et données</h3>
+        <div class="alert alert-info">
+            <p><strong>🔒 Votre vie privée est notre priorité</strong></p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Nous ne collectons AUCUNE adresse IP</li>
+                <li>Aucun email ou donnée personnelle stockée</li>
+                <li>Sessions sécurisées, chiffrées end-to-end</li>
+                <li>Hébergement en Belgique (GDPR compliant)</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+            <h4>Vos droits RGPD</h4>
+            <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez des droits suivants:</p>
+
+            <div style="margin-top: 1rem;">
+                <a href="/forum/export" class="btn btn-secondary">
+                    📥 Exporter mes données
+                </a>
+                <p class="text-small" style="margin-top: 0.5rem;">
+                    Téléchargez toutes vos discussions et réponses au format JSON
+                </p>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <a href="/forum/delete-account" class="btn btn-danger">
+                    🗑️ Supprimer mon compte
+                </a>
+                <p class="text-small" style="margin-top: 0.5rem;">
+                    Suppression définitive de votre compte et de tout votre contenu
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Section -->
+    <section style="margin-bottom: 3rem;">
+        <h3>Sécurité</h3>
+        <div style="background: #f9f9f9; padding: 1.5rem; border-radius: 4px;">
+            <h4>⚠️ À propos de votre code PIN</h4>
+            <p>Votre code PIN est chiffré avec Argon2id et ne peut pas être récupéré.</p>
+            <p style="margin-top: 0.5rem;"><strong>Si vous oubliez votre PIN, votre compte sera définitivement perdu.</strong></p>
+            <p style="margin-top: 0.5rem;" class="text-small">
+                Par design, il n'existe aucun moyen de réinitialiser votre PIN. Ceci garantit que personne (y compris les administrateurs) ne peut accéder à votre compte.
+            </p>
+        </div>
+
+        <div style="margin-top: 1.5rem; background: #fff3cd; padding: 1rem; border-radius: 4px; border: 1px solid #ffc107;">
+            <h4 style="color: #856404;">💡 Conseils de sécurité</h4>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #856404;">
+                <li>Notez votre PIN dans un endroit sûr</li>
+                <li>Ne partagez jamais votre PIN avec qui que ce soit</li>
+                <li>Déconnectez-vous toujours sur les ordinateurs partagés</li>
+                <li>N'utilisez pas ce forum sur un réseau Wi-Fi public non sécurisé</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Account Statistics (Optional) -->
+    <section style="margin-bottom: 3rem;">
+        <h3>Statistiques</h3>
+        <div style="background: #f9f9f9; padding: 1.5rem; border-radius: 4px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                <div>
+                    <p class="text-small">Discussions créées</p>
+                    <p style="font-size: 1.5rem; font-weight: 600; color: #3498db;"><%= typeof stats !== 'undefined' ? stats.threadCount : 0 %></p>
+                </div>
+                <div>
+                    <p class="text-small">Réponses postées</p>
+                    <p style="font-size: 1.5rem; font-weight: 600; color: #2ecc71;"><%= typeof stats !== 'undefined' ? stats.replyCount : 0 %></p>
+                </div>
+                <div>
+                    <p class="text-small">Jours actifs</p>
+                    <p style="font-size: 1.5rem; font-weight: 600; color: #9b59b6;">
+                        <%= typeof stats !== 'undefined' ? Math.floor((new Date() - new Date(user.createdAt)) / (1000 * 60 * 60 * 24)) : 0 %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Help & Resources -->
+    <section style="margin-bottom: 3rem;">
+        <h3>Aide et ressources</h3>
+        <div style="background: #e74c3c; color: #fff; padding: 1.5rem; border-radius: 4px;">
+            <h4 style="color: #fff;">🆘 Besoin d'aide d'urgence?</h4>
+            <p style="margin-top: 0.5rem;">
+                <strong>Centre de Prévention du Suicide:</strong> 0800 32 123 (24/7, gratuit et anonyme)<br>
+                <strong>Zelfmoordlijn:</strong> 1813 (24/7)<br>
+                <strong>Urgences:</strong> 112
+            </p>
+            <a href="/forum/resources" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #fff; color: #e74c3c; text-decoration: none; border-radius: 4px; font-weight: 600;">
+                Voir toutes les ressources d'aide
+            </a>
+        </div>
+    </section>
+</div>
+
+<%- include('../partials/footer') %>

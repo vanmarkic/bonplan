@@ -1,0 +1,183 @@
+<%- include('../partials/header', { title: 'Modifier la réponse - Le Syndicat des Tox' }) %>
+
+<!-- Breadcrumb navigation -->
+<div style="margin-bottom: 1.5rem;">
+    <a href="/forum/threads/<%= thread.id %>" style="color: #3498db; text-decoration: none;">← Retour à la discussion</a>
+</div>
+
+<h2>Modifier la réponse</h2>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <%= error %>
+    </div>
+<% } %>
+
+<% if (reply.editTimeRemaining) { %>
+    <div class="alert alert-info" style="margin-bottom: 2rem;">
+        <strong>⏱️ Temps restant pour modifier:</strong> <%= reply.editTimeRemaining %>
+        <p style="margin-top: 0.5rem; font-size: 0.875rem;">
+            Après ce délai, vous ne pourrez plus modifier votre réponse.
+        </p>
+    </div>
+<% } else { %>
+    <div class="alert alert-error" style="margin-bottom: 2rem;">
+        <strong>⚠️ Délai de modification expiré</strong>
+        <p style="margin-top: 0.5rem;">
+            Le délai de 15 minutes pour modifier cette réponse est écoulé.
+            Seuls les modérateurs peuvent maintenant intervenir en cas de problème.
+        </p>
+        <a href="/forum/threads/<%= thread.id %>" class="btn btn-secondary" style="margin-top: 0.5rem;">Retour à la discussion</a>
+    </div>
+<% } %>
+
+<% if (reply.canEdit) { %>
+    <form method="POST" action="/forum/replies/<%= reply.id %>/edit" onsubmit="return validateForm()">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="_method" value="PUT">
+
+        <div class="form-group">
+            <label for="content">Votre réponse: *</label>
+            <textarea
+                id="content"
+                name="content"
+                required
+                minlength="10"
+                maxlength="10000"
+                rows="12"
+                onkeyup="updateContentCount()"
+            ><%= reply.content %></textarea>
+            <div class="char-counter">
+                <span id="content-count">0</span> / 10000 caractères (minimum 10)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="edit_reason">Raison de la modification (optionnel):</label>
+            <input
+                type="text"
+                id="edit_reason"
+                name="edit_reason"
+                maxlength="100"
+                placeholder="Ex: Correction d'une faute de frappe, ajout d'informations..."
+            >
+            <div class="text-small">
+                Cette information sera visible dans l'historique des modifications
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn">
+                ✅ Enregistrer les modifications
+            </button>
+            <button type="button" onclick="if(confirm('Abandonner les modifications?')) { window.location.href='/forum/threads/<%= thread.id %>'; }" class="btn btn-secondary" style="margin-left: 1rem;">
+                ❌ Annuler
+            </button>
+        </div>
+    </form>
+
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #ccc;">
+        <h3 style="color: #e74c3c;">Zone dangereuse</h3>
+        <p style="margin-bottom: 1rem;">Cette action est irréversible:</p>
+        <button onclick="deleteReply()" class="btn btn-danger">
+            🗑️ Supprimer définitivement cette réponse
+        </button>
+    </div>
+<% } %>
+
+<script>
+// Initialize character counter on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateContentCount();
+    startEditTimer();
+});
+
+function updateContentCount() {
+    const textarea = document.getElementById('content');
+    const count = textarea.value.length;
+    const counter = document.getElementById('content-count');
+    counter.textContent = count;
+
+    const container = counter.parentElement;
+    container.className = 'char-counter';
+
+    if (count < 10) {
+        container.className = 'char-counter error';
+    } else if (count > 9000) {
+        container.className = 'char-counter warning';
+    } else if (count > 9900) {
+        container.className = 'char-counter error';
+    }
+}
+
+function validateForm() {
+    const content = document.getElementById('content').value;
+
+    if (content.trim().length < 10) {
+        alert('La réponse doit contenir au moins 10 caractères.');
+        return false;
+    }
+
+    return confirm('Enregistrer les modifications?');
+}
+
+function deleteReply() {
+    const confirmMsg = 'ATTENTION: Cette action est IRRÉVERSIBLE!\n\n' +
+                      'Êtes-vous absolument certain de vouloir supprimer cette réponse?';
+
+    if (confirm(confirmMsg)) {
+        if (confirm('Dernière chance: Confirmer la suppression?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/forum/replies/<%= reply.id %>/delete';
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_csrf';
+            csrf.value = '<%= csrfToken %>';
+            form.appendChild(csrf);
+            const method = document.createElement('input');
+            method.type = 'hidden';
+            method.name = '_method';
+            method.value = 'DELETE';
+            form.appendChild(method);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+}
+
+function startEditTimer() {
+    <% if (reply.editTimeRemainingSeconds) { %>
+        let seconds = <%= reply.editTimeRemainingSeconds %>;
+        const timerElement = document.querySelector('.alert-info strong');
+
+        if (timerElement) {
+            const interval = setInterval(function() {
+                seconds--;
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    window.location.reload();
+                } else {
+                    const minutes = Math.floor(seconds / 60);
+                    const secs = seconds % 60;
+                    const timeStr = minutes > 0
+                        ? `${minutes} minute${minutes !== 1 ? 's' : ''} ${secs} seconde${secs !== 1 ? 's' : ''}`
+                        : `${secs} seconde${secs !== 1 ? 's' : ''}`;
+                    timerElement.textContent = '⏱️ Temps restant pour modifier: ' + timeStr;
+
+                    // Change alert color when time is running out
+                    if (seconds < 60) {
+                        timerElement.parentElement.className = 'alert alert-error';
+                    } else if (seconds < 180) {
+                        timerElement.parentElement.style.background = '#fff3cd';
+                        timerElement.parentElement.style.borderColor = '#ffc107';
+                        timerElement.parentElement.style.color = '#856404';
+                    }
+                }
+            }, 1000);
+        }
+    <% } %>
+}
+</script>
+
+<%- include('../partials/footer') %>

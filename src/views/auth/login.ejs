@@ -1,6 +1,6 @@
 <%- include('../partials/header') %>
 
-<h2>Connexion</h2>
+<h2><%= t('auth.login') %></h2>
 
 <% if (typeof error !== 'undefined' && error) { %>
 <div class="alert alert-error">
@@ -11,7 +11,7 @@
 <div style="max-width: 500px;">
     <form method="POST" action="/auth/login">
         <div class="form-group">
-            <label for="pseudo">Pseudo</label>
+            <label for="pseudo"><%= t('auth.pseudo') %></label>
             <input
                 type="text"
                 id="pseudo"
@@ -23,7 +23,7 @@
         </div>
 
         <div class="form-group">
-            <label for="pin">Code PIN (4 chiffres)</label>
+            <label for="pin"><%= t('auth.pin') %></label>
             <input
                 type="password"
                 id="pin"
@@ -34,11 +34,11 @@
                 inputmode="numeric"
                 autocomplete="off"
             >
-            <p class="text-small">⚠️ Si vous avez oublié votre PIN, il n'y a pas de récupération possible.</p>
+            <p class="text-small"><%= t('auth.rememberPIN') %></p>
         </div>
 
-        <button type="submit" class="btn">Se connecter</button>
-        <a href="/auth/register" class="btn btn-secondary" style="margin-left: 1rem;">Créer un compte</a>
+        <button type="submit" class="btn"><%= t('auth.login') %></button>
+        <a href="/auth/register" class="btn btn-secondary" style="margin-left: 1rem;"><%= t('nav.register') %></a>
     </form>
 </div>
 

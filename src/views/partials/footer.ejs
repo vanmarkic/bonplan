@@ -2,16 +2,16 @@
 
     <footer>
         <div class="container">
-            <p><strong>Le Syndicat des Tox</strong> - Forum anonyme de soutien par les pairs</p>
+            <p><strong><%= t('app.name') %></strong> - <%= t('app.tagline') %></p>
             <p class="text-small">
-                <a href="/privacy">Vie privée</a> |
-                <a href="/about">À propos</a> |
-                <a href="/about#crisis">Ressources d'urgence</a>
+                <a href="/privacy"><%= t('privacy.title') %></a> |
+                <a href="/about"><%= t('resources.title') %></a> |
+                <a href="/about#crisis"><%= t('resources.crisis') %></a>
             </p>
             <p class="text-small" style="margin-top: 1rem;">
-                ⚠️ Ce site ne collecte AUCUNE donnée personnelle (pas d'email, pas d'adresse IP).<br>
-                💊 Nous pratiquons la réduction des risques, pas la prohibition.<br>
-                🔒 Votre anonymat est notre priorité absolue.
+                <%= t('privacy.noPersonalData') %><br>
+                <%= t('community.harmReduction') %><br>
+                <%= t('privacy.anonymous') %>
             </p>
         </div>
     </footer>
