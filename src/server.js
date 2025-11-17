@@ -45,6 +45,10 @@ app.use(anonymizeMiddleware);
 // Session management
 app.use(sessionMiddleware);
 
+// CSRF Protection
+const csrfMiddleware = require('./middleware/csrf');
+app.use(csrfMiddleware);
+
 // Static files
 app.use('/public', express.static(path.join(__dirname, '../public'), {
   maxAge: '7d',

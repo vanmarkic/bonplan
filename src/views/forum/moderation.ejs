@@ -1,0 +1,395 @@
+<%- include('../partials/header', { title: 'Tableau de bord de modération - Le Syndicat des Tox' }) %>
+
+<!-- Breadcrumb navigation -->
+<div style="margin-bottom: 1.5rem;">
+    <a href="/forum/threads" style="color: #3498db; text-decoration: none;">← Retour aux discussions</a>
+</div>
+
+<h2>🛡️ Tableau de bord de modération</h2>
+
+<% if (!user || !user.isModerator) { %>
+    <div class="alert alert-error">
+        <strong>Accès refusé</strong>
+        <p>Cette page est réservée aux modérateurs.</p>
+        <a href="/forum/threads" class="btn btn-secondary" style="margin-top: 0.5rem;">Retour aux discussions</a>
+    </div>
+<% } else { %>
+
+    <!-- Moderation stats -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="background: #fee; padding: 1rem; border-radius: 4px; border: 1px solid #fcc;">
+            <h3 style="margin: 0; color: #c00;">⚠️ Signalements</h3>
+            <p style="font-size: 2rem; margin: 0.5rem 0; font-weight: bold;"><%= stats.reportedCount || 0 %></p>
+            <p style="margin: 0; font-size: 0.875rem; color: #999;">À traiter</p>
+        </div>
+
+        <div style="background: #ffe; padding: 1rem; border-radius: 4px; border: 1px solid #ffc;">
+            <h3 style="margin: 0; color: #f39c12;">📌 Épinglés</h3>
+            <p style="font-size: 2rem; margin: 0.5rem 0; font-weight: bold;"><%= stats.pinnedCount || 0 %></p>
+            <p style="margin: 0; font-size: 0.875rem; color: #999;">Discussions</p>
+        </div>
+
+        <div style="background: #f0f0f0; padding: 1rem; border-radius: 4px; border: 1px solid #ddd;">
+            <h3 style="margin: 0; color: #7f8c8d;">🔒 Verrouillés</h3>
+            <p style="font-size: 2rem; margin: 0.5rem 0; font-weight: bold;"><%= stats.lockedCount || 0 %></p>
+            <p style="margin: 0; font-size: 0.875rem; color: #999;">Discussions</p>
+        </div>
+
+        <div style="background: #efe; padding: 1rem; border-radius: 4px; border: 1px solid #cfc;">
+            <h3 style="margin: 0; color: #27ae60;">✅ Traités</h3>
+            <p style="font-size: 2rem; margin: 0.5rem 0; font-weight: bold;"><%= stats.resolvedToday || 0 %></p>
+            <p style="margin: 0; font-size: 0.875rem; color: #999;">Aujourd'hui</p>
+        </div>
+    </div>
+
+    <!-- Tabs navigation -->
+    <div style="border-bottom: 2px solid #ecf0f1; margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1rem;">
+            <button onclick="showTab('reported')" id="tab-reported" class="btn btn-secondary" style="border-radius: 4px 4px 0 0; border-bottom: 2px solid transparent;">
+                ⚠️ Signalements (<%= reportedItems ? reportedItems.length : 0 %>)
+            </button>
+            <button onclick="showTab('hidden')" id="tab-hidden" class="btn btn-secondary" style="border-radius: 4px 4px 0 0; border-bottom: 2px solid transparent;">
+                👁️ Contenu masqué (<%= hiddenItems ? hiddenItems.length : 0 %>)
+            </button>
+            <button onclick="showTab('pinned')" id="tab-pinned" class="btn btn-secondary" style="border-radius: 4px 4px 0 0; border-bottom: 2px solid transparent;">
+                📌 Discussions épinglées (<%= pinnedThreads ? pinnedThreads.length : 0 %>)
+            </button>
+            <button onclick="showTab('logs')" id="tab-logs" class="btn btn-secondary" style="border-radius: 4px 4px 0 0; border-bottom: 2px solid transparent;">
+                📋 Journal d'activité
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab content: Reported items -->
+    <div id="content-reported" class="tab-content">
+        <h3>Contenu signalé</h3>
+
+        <% if (reportedItems && reportedItems.length > 0) { %>
+            <% reportedItems.forEach(item => { %>
+                <div class="moderation-item reported">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0 0 0.5rem 0;">
+                                <% if (item.type === 'thread') { %>
+                                    📄 Discussion:
+                                <% } else { %>
+                                    💬 Réponse:
+                                <% } %>
+                                <a href="<%= item.type === 'thread' ? '/forum/threads/' + item.id : '/forum/threads/' + item.threadId + '#reply-' + item.id %>" target="_blank">
+                                    <%= item.title || 'Sans titre' %>
+                                </a>
+                            </h4>
+
+                            <div class="thread-meta">
+                                <span>Auteur: <strong><%= item.author || '[supprimé]' %></strong></span>
+                                <span> • Signalé le: <%= item.reportedAt %></span>
+                                <span> • Nombre de signalements: <strong style="color: #e74c3c;"><%= item.reportCount || 1 %></strong></span>
+                            </div>
+
+                            <div style="margin: 1rem 0;">
+                                <strong>Raisons des signalements:</strong>
+                                <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                    <% if (item.reportReasons && item.reportReasons.length > 0) { %>
+                                        <% item.reportReasons.forEach(reason => { %>
+                                            <li>
+                                                <%= getReason(reason.reason) %>
+                                                <% if (reason.details) { %>
+                                                    : "<%= reason.details %>"
+                                                <% } %>
+                                                <span class="text-small">(par <%= reason.reporter || 'anonyme' %>)</span>
+                                            </li>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <li>Pas de détails disponibles</li>
+                                    <% } %>
+                                </ul>
+                            </div>
+
+                            <div style="background: #f9f9f9; padding: 0.75rem; border-radius: 4px; margin: 1rem 0;">
+                                <strong>Extrait du contenu:</strong>
+                                <p style="margin: 0.5rem 0 0 0;">
+                                    <%= item.excerpt ? item.excerpt.substring(0, 300) : '[Contenu non disponible]' %>
+                                    <%= item.excerpt && item.excerpt.length > 300 ? '...' : '' %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+                        <strong>Actions:</strong>
+                        <div style="margin-top: 0.5rem;">
+                            <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'dismiss')" class="btn btn-secondary">
+                                ✅ Ignorer (pas de problème)
+                            </button>
+                            <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'hide')" class="btn btn-warning">
+                                👁️ Masquer le contenu
+                            </button>
+                            <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'delete')" class="btn btn-danger">
+                                🗑️ Supprimer définitivement
+                            </button>
+                            <% if (item.type === 'thread') { %>
+                                <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'lock')" class="btn btn-warning">
+                                    🔒 Verrouiller la discussion
+                                </button>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="no-results">
+                <p style="font-size: 2rem;">✅</p>
+                <p>Aucun contenu signalé à traiter!</p>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Tab content: Hidden items -->
+    <div id="content-hidden" class="tab-content" style="display: none;">
+        <h3>Contenu masqué</h3>
+
+        <% if (hiddenItems && hiddenItems.length > 0) { %>
+            <% hiddenItems.forEach(item => { %>
+                <div class="moderation-item">
+                    <h4>
+                        <% if (item.type === 'thread') { %>
+                            📄 Discussion:
+                        <% } else { %>
+                            💬 Réponse:
+                        <% } %>
+                        <%= item.title || 'Sans titre' %>
+                    </h4>
+
+                    <div class="thread-meta">
+                        <span>Auteur: <%= item.author || '[supprimé]' %></span>
+                        <span> • Masqué le: <%= item.hiddenAt %></span>
+                        <span> • Par: <%= item.moderatedBy %></span>
+                    </div>
+
+                    <div style="margin-top: 1rem;">
+                        <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'unhide')" class="btn btn-secondary">
+                            👁️ Rendre visible
+                        </button>
+                        <button onclick="moderateItem('<%= item.type %>', '<%= item.id %>', 'delete')" class="btn btn-danger">
+                            🗑️ Supprimer définitivement
+                        </button>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="no-results">
+                <p>Aucun contenu masqué</p>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Tab content: Pinned threads -->
+    <div id="content-pinned" class="tab-content" style="display: none;">
+        <h3>Discussions épinglées</h3>
+
+        <% if (pinnedThreads && pinnedThreads.length > 0) { %>
+            <div class="alert alert-info" style="margin-bottom: 1rem;">
+                <strong>Note:</strong> Les discussions épinglées apparaissent en haut de la liste des discussions.
+                Limitez-vous à 3-5 discussions épinglées maximum pour une meilleure expérience utilisateur.
+            </div>
+
+            <% pinnedThreads.forEach(thread => { %>
+                <div class="moderation-item">
+                    <h4>
+                        <a href="/forum/threads/<%= thread.id %>" target="_blank">
+                            📌 <%= thread.title %>
+                        </a>
+                    </h4>
+
+                    <div class="thread-meta">
+                        <span>Auteur: <%= thread.author || '[supprimé]' %></span>
+                        <span> • Épinglé le: <%= thread.pinnedAt %></span>
+                        <span> • <%= thread.replyCount || 0 %> réponses</span>
+                    </div>
+
+                    <div style="margin-top: 1rem;">
+                        <button onclick="moderateItem('thread', '<%= thread.id %>', 'unpin')" class="btn btn-secondary">
+                            📌 Désépingler
+                        </button>
+                        <% if (!thread.isLocked) { %>
+                            <button onclick="moderateItem('thread', '<%= thread.id %>', 'lock')" class="btn btn-warning">
+                                🔒 Verrouiller
+                            </button>
+                        <% } %>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="no-results">
+                <p>Aucune discussion épinglée</p>
+                <a href="/forum/threads" class="btn btn-secondary" style="margin-top: 1rem;">
+                    Parcourir les discussions
+                </a>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Tab content: Activity logs -->
+    <div id="content-logs" class="tab-content" style="display: none;">
+        <h3>Journal d'activité de modération (dernières 48h)</h3>
+
+        <% if (activityLogs && activityLogs.length > 0) { %>
+            <div style="max-height: 500px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #ecf0f1;">
+                            <th style="padding: 0.5rem; text-align: left;">Date/Heure</th>
+                            <th style="padding: 0.5rem; text-align: left;">Modérateur</th>
+                            <th style="padding: 0.5rem; text-align: left;">Action</th>
+                            <th style="padding: 0.5rem; text-align: left;">Cible</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% activityLogs.forEach(log => { %>
+                            <tr style="border-bottom: 1px solid #ecf0f1;">
+                                <td style="padding: 0.5rem;"><%= log.timestamp %></td>
+                                <td style="padding: 0.5rem;"><%= log.moderator %></td>
+                                <td style="padding: 0.5rem;">
+                                    <span class="<%= getActionClass(log.action) %>">
+                                        <%= getActionLabel(log.action) %>
+                                    </span>
+                                </td>
+                                <td style="padding: 0.5rem;">
+                                    <% if (log.targetUrl) { %>
+                                        <a href="<%= log.targetUrl %>" target="_blank">
+                                            <%= log.targetTitle || 'Voir' %>
+                                        </a>
+                                    <% } else { %>
+                                        <%= log.targetTitle || 'N/A' %>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } else { %>
+            <div class="no-results">
+                <p>Aucune activité de modération récente</p>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Moderation guidelines -->
+    <div class="alert alert-info" style="margin-top: 2rem;">
+        <h4>📋 Principes de modération</h4>
+        <ul style="margin: 0.5rem 0 0 1.5rem;">
+            <li>Privilégiez toujours la bienveillance et le dialogue</li>
+            <li>Ne supprimez que le contenu clairement dangereux ou illégal</li>
+            <li>Respectez les principes de réduction des risques</li>
+            <li>En cas de doute, consultez les autres modérateurs</li>
+            <li>Documentez vos actions importantes dans le journal</li>
+        </ul>
+    </div>
+
+<% } %>
+
+<!-- Helper functions -->
+<%
+function getReason(reason) {
+    const reasons = {
+        'spam': 'Spam',
+        'inappropriate': 'Contenu inapproprié',
+        'harassment': 'Harcèlement',
+        'misinformation': 'Désinformation dangereuse',
+        'other': 'Autre'
+    };
+    return reasons[reason] || reason;
+}
+
+function getActionLabel(action) {
+    const actions = {
+        'dismiss': 'Ignoré',
+        'hide': 'Masqué',
+        'unhide': 'Rendu visible',
+        'delete': 'Supprimé',
+        'lock': 'Verrouillé',
+        'unlock': 'Déverrouillé',
+        'pin': 'Épinglé',
+        'unpin': 'Désépinglé'
+    };
+    return actions[action] || action;
+}
+
+function getActionClass(action) {
+    if (['delete', 'hide', 'lock'].includes(action)) return 'text-danger';
+    if (['dismiss', 'unhide', 'unlock'].includes(action)) return 'text-success';
+    return '';
+}
+%>
+
+<script>
+function showTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+
+    // Remove active class from all buttons
+    document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+        btn.style.background = '#95a5a6';
+        btn.style.borderBottom = '2px solid transparent';
+    });
+
+    // Show selected tab
+    document.getElementById('content-' + tabName).style.display = 'block';
+
+    // Mark button as active
+    const activeBtn = document.getElementById('tab-' + tabName);
+    activeBtn.style.background = '#3498db';
+    activeBtn.style.borderBottom = '2px solid #3498db';
+}
+
+function moderateItem(type, id, action) {
+    let confirmMsg = 'Confirmer cette action: ' + action + '?';
+
+    if (action === 'delete') {
+        confirmMsg = 'ATTENTION: Cette action est irréversible! Confirmer la suppression?';
+    }
+
+    if (confirm(confirmMsg)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/forum/moderation/action';
+
+        const typeInput = document.createElement('input');
+        typeInput.type = 'hidden';
+        typeInput.name = 'type';
+        typeInput.value = type;
+
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'id';
+        idInput.value = id;
+
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = action;
+
+        form.appendChild(typeInput);
+        form.appendChild(idInput);
+        form.appendChild(actionInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Initialize first tab
+document.addEventListener('DOMContentLoaded', function() {
+    showTab('reported');
+});
+</script>
+
+<style>
+.text-danger { color: #e74c3c; font-weight: 600; }
+.text-success { color: #27ae60; font-weight: 600; }
+.text-warning { color: #f39c12; font-weight: 600; }
+</style>
+
+<%- include('../partials/footer') %>

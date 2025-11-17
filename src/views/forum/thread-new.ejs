@@ -1,0 +1,178 @@
+<%- include('../partials/header', { title: 'Nouvelle discussion - Le Syndicat des Tox' }) %>
+
+<!-- Breadcrumb navigation -->
+<div style="margin-bottom: 1.5rem;">
+    <a href="/forum/threads" style="color: #3498db; text-decoration: none;">← Retour aux discussions</a>
+</div>
+
+<h2>Créer une nouvelle discussion</h2>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <%= error %>
+    </div>
+<% } %>
+
+<div class="alert alert-info" style="margin-bottom: 2rem;">
+    <strong>📝 Conseils pour une bonne discussion:</strong>
+    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+        <li>Choisissez un titre clair et descriptif</li>
+        <li>Soyez respectueux et bienveillant</li>
+        <li>Partagez votre expérience sans jugement</li>
+        <li>Évitez de mentionner des noms réels ou des lieux précis</li>
+    </ul>
+</div>
+
+<form method="POST" action="/forum/threads/new" onsubmit="return validateForm()">
+    <div class="form-group">
+        <label for="title">Titre de la discussion: *</label>
+        <input
+            type="text"
+            id="title"
+            name="title"
+            required
+            minlength="5"
+            maxlength="200"
+            placeholder="Ex: Comment gérer les envies de consommer?"
+            value="<%= typeof formData !== 'undefined' && formData.title ? formData.title : '' %>"
+            onkeyup="updateTitleCount()"
+        >
+        <div class="char-counter">
+            <span id="title-count">0</span> / 200 caractères (minimum 5)
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="content">Votre message: *</label>
+        <textarea
+            id="content"
+            name="content"
+            required
+            minlength="10"
+            maxlength="10000"
+            rows="12"
+            placeholder="Partagez votre expérience, posez vos questions..."
+            onkeyup="updateContentCount()"
+        ><%= typeof formData !== 'undefined' && formData.content ? formData.content : '' %></textarea>
+        <div class="char-counter">
+            <span id="content-count">0</span> / 10000 caractères (minimum 10)
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="language">Langue de la discussion:</label>
+        <select id="language" name="language">
+            <option value="fr" <%= (!formData || formData.language === 'fr') ? 'selected' : '' %>>Français</option>
+            <option value="nl" <%= (formData && formData.language === 'nl') ? 'selected' : '' %>>Nederlands</option>
+            <option value="en" <%= (formData && formData.language === 'en') ? 'selected' : '' %>>English</option>
+            <option value="de" <%= (formData && formData.language === 'de') ? 'selected' : '' %>>Deutsch</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label style="display: flex; align-items: center; cursor: pointer;">
+            <input
+                type="checkbox"
+                name="anonymous"
+                id="anonymous"
+                style="width: auto; margin-right: 0.5rem;"
+                <%= (formData && formData.anonymous) ? 'checked' : '' %>
+            >
+            <span>Publier en tant qu'anonyme (votre pseudo ne sera pas affiché)</span>
+        </label>
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <button type="submit" class="btn">
+            ✅ Publier la discussion
+        </button>
+        <button type="button" onclick="if(confirm('Abandonner cette discussion?')) { window.location.href='/forum/threads'; }" class="btn btn-secondary" style="margin-left: 1rem;">
+            ❌ Annuler
+        </button>
+    </div>
+</form>
+
+<div class="alert alert-info" style="margin-top: 2rem;">
+    <strong>⚠️ Rappel important:</strong>
+    <p style="margin-top: 0.5rem;">
+        Vous aurez 15 minutes après la publication pour modifier ou supprimer votre message.
+        Après ce délai, seuls les modérateurs pourront intervenir en cas de problème.
+    </p>
+</div>
+
+<script>
+// Initialize character counters on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateTitleCount();
+    updateContentCount();
+});
+
+function updateTitleCount() {
+    const input = document.getElementById('title');
+    const count = input.value.length;
+    const counter = document.getElementById('title-count');
+    counter.textContent = count;
+
+    const container = counter.parentElement;
+    container.className = 'char-counter';
+
+    if (count < 5) {
+        container.className = 'char-counter error';
+    } else if (count > 180) {
+        container.className = 'char-counter warning';
+    } else if (count > 195) {
+        container.className = 'char-counter error';
+    }
+}
+
+function updateContentCount() {
+    const textarea = document.getElementById('content');
+    const count = textarea.value.length;
+    const counter = document.getElementById('content-count');
+    counter.textContent = count;
+
+    const container = counter.parentElement;
+    container.className = 'char-counter';
+
+    if (count < 10) {
+        container.className = 'char-counter error';
+    } else if (count > 9000) {
+        container.className = 'char-counter warning';
+    } else if (count > 9900) {
+        container.className = 'char-counter error';
+    }
+}
+
+function validateForm() {
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+
+    if (title.trim().length < 5) {
+        alert('Le titre doit contenir au moins 5 caractères.');
+        return false;
+    }
+
+    if (content.trim().length < 10) {
+        alert('Le message doit contenir au moins 10 caractères.');
+        return false;
+    }
+
+    // Confirmation for sensitive topics
+    const sensitiveWords = ['suicide', 'overdose', 'OD', 'mort'];
+    const combinedText = (title + ' ' + content).toLowerCase();
+
+    for (const word of sensitiveWords) {
+        if (combinedText.includes(word.toLowerCase())) {
+            const confirmMsg = 'Votre message semble aborder des sujets sensibles. ' +
+                             'Assurez-vous d\'être dans un état d\'esprit approprié pour cette discussion. ' +
+                             'Si vous êtes en détresse, consultez les ressources d\'urgence dans le menu "À propos". ' +
+                             '\n\nContinuer la publication?';
+            return confirm(confirmMsg);
+        }
+    }
+
+    return true;
+}
+</script>
+
+<%- include('../partials/footer') %>

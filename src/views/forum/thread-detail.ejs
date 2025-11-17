@@ -1,0 +1,286 @@
+<%- include('../partials/header', { title: thread.title + ' - Le Syndicat des Tox' }) %>
+
+<!-- Breadcrumb navigation -->
+<div style="margin-bottom: 1.5rem;">
+    <a href="/forum/threads" style="color: #3498db; text-decoration: none;">← Retour aux discussions</a>
+</div>
+
+<!-- Thread content -->
+<article style="margin-bottom: 2rem;">
+    <% if (thread.isPinned) { %>
+        <div class="alert alert-info" style="margin-bottom: 1rem;">
+            📌 Cette discussion est épinglée par les modérateurs
+        </div>
+    <% } %>
+
+    <% if (thread.isLocked) { %>
+        <div class="alert alert-warning" style="margin-bottom: 1rem;">
+            🔒 Cette discussion est verrouillée. Aucune nouvelle réponse ne peut être ajoutée.
+        </div>
+    <% } %>
+
+    <h1 style="font-size: 1.75rem; margin-bottom: 1rem;"><%= thread.title %></h1>
+
+    <div class="thread-meta" style="margin-bottom: 1.5rem;">
+        <span>Par <strong><%= thread.author || '[supprimé]' %></strong></span>
+        <% if (thread.isModerator) { %>
+            <span class="moderator-badge">🛡️ Modérateur</span>
+        <% } %>
+        <span> • <%= thread.createdAt %></span>
+        <% if (thread.isEdited) { %>
+            <span> • (modifié)</span>
+        <% } %>
+    </div>
+
+    <div style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.5rem;">
+        <% if (thread.isDeleted) { %>
+            <p class="deleted-content">[Message supprimé]</p>
+        <% } else { %>
+            <%- thread.content.replace(/\n/g, '<br>') %>
+        <% } %>
+    </div>
+
+    <!-- Thread actions -->
+    <% if (typeof user !== 'undefined' && user) { %>
+        <div class="thread-actions">
+            <% if (user.id === thread.authorId && thread.canEdit) { %>
+                <a href="/forum/threads/<%= thread.id %>/edit" class="btn btn-secondary">
+                    ✏️ Modifier
+                </a>
+                <% if (thread.editTimeRemaining) { %>
+                    <span class="edit-timer">
+                        ⏱️ <%= thread.editTimeRemaining %> restantes pour modifier
+                    </span>
+                <% } %>
+                <button onclick="if(confirm('Êtes-vous sûr de vouloir supprimer ce message?')) { document.getElementById('delete-form').submit(); }" class="btn btn-danger">
+                    🗑️ Supprimer
+                </button>
+                <form id="delete-form" method="POST" action="/forum/threads/<%= thread.id %>/delete" style="display: none;">
+                    <input type="hidden" name="_method" value="DELETE">
+                </form>
+            <% } %>
+
+            <% if (user.id !== thread.authorId) { %>
+                <button onclick="document.getElementById('report-form').style.display='block'" class="btn btn-warning">
+                    ⚠️ Signaler
+                </button>
+            <% } %>
+
+            <% if (user.isModerator) { %>
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #e74c3c;">
+                    <strong style="color: #e74c3c;">Actions de modération:</strong>
+                    <div style="margin-top: 0.5rem;">
+                        <% if (!thread.isPinned) { %>
+                            <button onclick="if(confirm('Épingler cette discussion?')) { moderateThread('pin'); }" class="btn btn-secondary">
+                                📌 Épingler
+                            </button>
+                        <% } else { %>
+                            <button onclick="if(confirm('Désépingler cette discussion?')) { moderateThread('unpin'); }" class="btn btn-secondary">
+                                📌 Désépingler
+                            </button>
+                        <% } %>
+                        <% if (!thread.isLocked) { %>
+                            <button onclick="if(confirm('Verrouiller cette discussion?')) { moderateThread('lock'); }" class="btn btn-warning">
+                                🔒 Verrouiller
+                            </button>
+                        <% } else { %>
+                            <button onclick="if(confirm('Déverrouiller cette discussion?')) { moderateThread('unlock'); }" class="btn btn-warning">
+                                🔓 Déverrouiller
+                            </button>
+                        <% } %>
+                        <% if (!thread.isHidden) { %>
+                            <button onclick="if(confirm('Masquer cette discussion?')) { moderateThread('hide'); }" class="btn btn-danger">
+                                👁️ Masquer
+                            </button>
+                        <% } else { %>
+                            <button onclick="if(confirm('Afficher cette discussion?')) { moderateThread('show'); }" class="btn btn-secondary">
+                                👁️ Afficher
+                            </button>
+                        <% } %>
+                    </div>
+                </div>
+                <script>
+                function moderateThread(action) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/forum/threads/<%= thread.id %>/moderate';
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'action';
+                    input.value = action;
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+                </script>
+            <% } %>
+        </div>
+
+        <!-- Report form (hidden by default) -->
+        <div id="report-form" class="report-form" style="display: none;">
+            <h3>Signaler ce contenu</h3>
+            <form method="POST" action="/forum/threads/<%= thread.id %>/report">
+                <div class="form-group">
+                    <label for="reason">Raison du signalement:</label>
+                    <select name="reason" id="reason" required>
+                        <option value="">-- Sélectionnez une raison --</option>
+                        <option value="spam">Spam</option>
+                        <option value="inappropriate">Contenu inapproprié</option>
+                        <option value="harassment">Harcèlement</option>
+                        <option value="misinformation">Désinformation dangereuse</option>
+                        <option value="other">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="details">Détails (optionnel):</label>
+                    <textarea name="details" id="details" rows="3" maxlength="500"></textarea>
+                </div>
+                <button type="submit" class="btn btn-warning">Envoyer le signalement</button>
+                <button type="button" onclick="document.getElementById('report-form').style.display='none'" class="btn btn-secondary">Annuler</button>
+            </form>
+        </div>
+    <% } %>
+</article>
+
+<hr style="margin: 2rem 0; border: none; border-top: 2px solid #ecf0f1;">
+
+<!-- Replies section -->
+<section>
+    <h2 style="margin-bottom: 1.5rem;">Réponses (<%= replies ? replies.length : 0 %>)</h2>
+
+    <% if (replies && replies.length > 0) { %>
+        <% replies.forEach(reply => { %>
+            <div class="reply" id="reply-<%= reply.id %>">
+                <div class="thread-meta" style="margin-bottom: 0.75rem;">
+                    <strong><%= reply.author || '[supprimé]' %></strong>
+                    <% if (reply.isModerator) { %>
+                        <span class="moderator-badge">🛡️ Modérateur</span>
+                    <% } %>
+                    <span> • <%= reply.createdAt %></span>
+                    <% if (reply.isEdited) { %>
+                        <span> • (modifié)</span>
+                    <% } %>
+                </div>
+
+                <div style="line-height: 1.6;">
+                    <% if (reply.isDeleted) { %>
+                        <p class="deleted-content">[Message supprimé]</p>
+                    <% } else { %>
+                        <%- reply.content.replace(/\n/g, '<br>') %>
+                    <% } %>
+                </div>
+
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <div style="margin-top: 0.75rem;">
+                        <% if (user.id === reply.authorId && reply.canEdit) { %>
+                            <button onclick="editReply('<%= reply.id %>')" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                ✏️ Modifier
+                            </button>
+                            <% if (reply.editTimeRemaining) { %>
+                                <span class="edit-timer" style="font-size: 0.75rem;">
+                                    <%= reply.editTimeRemaining %> restantes
+                                </span>
+                            <% } %>
+                            <button onclick="if(confirm('Supprimer cette réponse?')) { deleteReply('<%= reply.id %>'); }" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                🗑️ Supprimer
+                            </button>
+                        <% } %>
+                        <% if (user.id !== reply.authorId) { %>
+                            <button onclick="reportReply('<%= reply.id %>')" class="btn btn-warning" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                ⚠️ Signaler
+                            </button>
+                        <% } %>
+                        <% if (user.isModerator && !reply.isDeleted) { %>
+                            <button onclick="if(confirm('Masquer cette réponse?')) { moderateReply('<%= reply.id %>', 'hide'); }" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                👁️ Masquer
+                            </button>
+                        <% } %>
+                    </div>
+                <% } %>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <p style="color: #7f8c8d; text-align: center; padding: 2rem;">Aucune réponse pour le moment. Soyez le premier à répondre!</p>
+    <% } %>
+
+    <!-- Reply form -->
+    <% if (typeof user !== 'undefined' && user && !thread.isLocked) { %>
+        <div class="reply-form" style="margin-top: 2rem;">
+            <h3>Ajouter une réponse</h3>
+            <form method="POST" action="/forum/threads/<%= thread.id %>/replies">
+                <div class="form-group">
+                    <label for="content">Votre message:</label>
+                    <textarea name="content" id="content" required minlength="10" maxlength="5000" onkeyup="updateCharCount(this)"></textarea>
+                    <div class="char-counter">
+                        <span id="char-count">0</span> / 5000 caractères
+                    </div>
+                </div>
+                <button type="submit" class="btn">Publier la réponse</button>
+            </form>
+        </div>
+    <% } else if (!user) { %>
+        <div class="alert alert-info" style="margin-top: 2rem;">
+            <p><strong>Participez à la discussion!</strong></p>
+            <p><a href="/auth/login">Connectez-vous</a> ou <a href="/auth/register">créez un compte anonyme</a> pour répondre.</p>
+        </div>
+    <% } %>
+</section>
+
+<script>
+function updateCharCount(textarea) {
+    const count = textarea.value.length;
+    const counter = document.getElementById('char-count');
+    counter.textContent = count;
+
+    const container = counter.parentElement;
+    container.className = 'char-counter';
+    if (count > 4500) {
+        container.className = 'char-counter warning';
+    }
+    if (count > 4900) {
+        container.className = 'char-counter error';
+    }
+}
+
+function deleteReply(replyId) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/forum/replies/' + replyId + '/delete';
+    const method = document.createElement('input');
+    method.type = 'hidden';
+    method.name = '_method';
+    method.value = 'DELETE';
+    form.appendChild(method);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function reportReply(replyId) {
+    if (confirm('Signaler cette réponse comme inappropriée?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/forum/replies/' + replyId + '/report';
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function editReply(replyId) {
+    window.location.href = '/forum/replies/' + replyId + '/edit';
+}
+
+function moderateReply(replyId, action) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/forum/replies/' + replyId + '/moderate';
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'action';
+    input.value = action;
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+
+<%- include('../partials/footer') %>

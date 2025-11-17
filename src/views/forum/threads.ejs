@@ -1,0 +1,89 @@
+<%- include('../partials/header', { title: 'Discussions - Le Syndicat des Tox' }) %>
+
+<h2>Discussions</h2>
+
+<!-- Toolbar with new thread button and sorting options -->
+<div class="toolbar">
+    <% if (typeof user !== 'undefined' && user) { %>
+        <a href="/forum/threads/new" class="btn">✍️ Nouvelle discussion</a>
+    <% } else { %>
+        <div>
+            <a href="/auth/login" class="btn btn-secondary">Connectez-vous pour participer</a>
+        </div>
+    <% } %>
+
+    <div class="sort-options">
+        <span style="margin-right: 0.5rem; color: #7f8c8d;">Trier par:</span>
+        <a href="/forum/threads?sort=recent" class="<%= sort === 'recent' ? 'active' : '' %>">Récents</a>
+        <a href="/forum/threads?sort=newest" class="<%= sort === 'newest' ? 'active' : '' %>">Plus récents</a>
+        <a href="/forum/threads?sort=replies" class="<%= sort === 'replies' ? 'active' : '' %>">Plus de réponses</a>
+    </div>
+</div>
+
+<!-- Thread list -->
+<div class="thread-list">
+    <% if (threads && threads.length > 0) { %>
+        <% threads.forEach(thread => { %>
+            <div class="thread-item <%= thread.isPinned ? 'pinned' : '' %>">
+                <div class="thread-title">
+                    <a href="/forum/threads/<%= thread.id %>">
+                        <%= thread.title %>
+                    </a>
+                </div>
+
+                <div class="thread-meta">
+                    <span>Par <%= thread.author || '[supprimé]' %></span>
+                    <% if (thread.isModerator) { %>
+                        <span class="moderator-badge">🛡️ Modérateur</span>
+                    <% } %>
+                    <span> • <%= thread.replyCount || 0 %> réponse<%= thread.replyCount !== 1 ? 's' : '' %></span>
+                    <span> • Dernière activité: <%= thread.lastActivity || thread.createdAt %></span>
+                </div>
+
+                <% if (thread.excerpt) { %>
+                    <div class="thread-excerpt">
+                        <%= thread.excerpt.substring(0, 200) %><%= thread.excerpt.length > 200 ? '...' : '' %>
+                    </div>
+                <% } %>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <div class="no-results">
+            <p style="font-size: 3rem; margin-bottom: 1rem;">🤷</p>
+            <h3>Aucune discussion pour le moment</h3>
+            <p>Soyez le premier à lancer une conversation!</p>
+            <% if (typeof user !== 'undefined' && user) { %>
+                <a href="/forum/threads/new" class="btn" style="margin-top: 1rem;">Créer la première discussion</a>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<!-- Pagination -->
+<% if (totalPages && totalPages > 1) { %>
+    <div class="pagination">
+        <% if (currentPage > 1) { %>
+            <a href="/forum/threads?page=1&sort=<%= sort %>">« Début</a>
+            <a href="/forum/threads?page=<%= currentPage - 1 %>&sort=<%= sort %>">‹ Précédent</a>
+        <% } %>
+
+        <% for(let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+            <% if (i === currentPage) { %>
+                <span class="current"><%= i %></span>
+            <% } else { %>
+                <a href="/forum/threads?page=<%= i %>&sort=<%= sort %>"><%= i %></a>
+            <% } %>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+            <a href="/forum/threads?page=<%= currentPage + 1 %>&sort=<%= sort %>">Suivant ›</a>
+            <a href="/forum/threads?page=<%= totalPages %>&sort=<%= sort %>">Fin »</a>
+        <% } %>
+    </div>
+<% } %>
+
+<div class="alert alert-info" style="margin-top: 2rem;">
+    <strong>💡 Rappel:</strong> Ce forum est un espace bienveillant. Respectez les autres membres et leurs expériences. La réduction des risques et le soutien mutuel sont nos valeurs fondamentales.
+</div>
+
+<%- include('../partials/footer') %>
