@@ -1,0 +1,118 @@
+<%- include('../partials/header') %>
+
+<h2>Politique de confidentialité</h2>
+
+<div style="max-width: 800px;">
+    <p><em>Dernière mise à jour : <%= new Date().toLocaleDateString('fr-FR') %></em></p>
+
+    <h3>Notre engagement</h3>
+    <p><strong>Le Syndicat des Tox ne collecte AUCUNE donnée personnelle identifiable.</strong></p>
+    <p>Nous pratiquons la minimisation des données par principe, pas par compromis.</p>
+
+    <h3>Données collectées</h3>
+    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+        <tr style="background: #ecf0f1;">
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ccc;">Donnée</th>
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ccc;">Collectée ?</th>
+        </tr>
+        <tr>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;">Adresse IP</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ NON</strong> (anonymisée au niveau du proxy)</td>
+        </tr>
+        <tr>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;">Email</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ NON</strong> (jamais demandé)</td>
+        </tr>
+        <tr>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;">Numéro de téléphone</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ NON</strong> (jamais demandé)</td>
+        </tr>
+        <tr>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;">Nom réel</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ NON</strong> (jamais demandé)</td>
+        </tr>
+        <tr>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;">Localisation</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>❌ NON</strong> (aucun GPS, aucune géolocalisation)</td>
+        </tr>
+        <tr>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;">Pseudo</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>✅ OUI</strong> (choisi par vous, anonyme)</td>
+        </tr>
+        <tr>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;">Code PIN</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>✅ OUI</strong> (chiffré avec Argon2id, impossible à déchiffrer)</td>
+        </tr>
+        <tr>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;">Messages</td>
+            <td style="padding: 0.5rem; border: 1px solid #ccc;"><strong>✅ OUI</strong> (publics, associés à votre pseudo)</td>
+        </tr>
+    </table>
+
+    <h3>Cookies</h3>
+    <p>Nous utilisons UN SEUL cookie essentiel :</p>
+    <ul>
+        <li><strong>Cookie de session (sid)</strong> : Nécessaire pour maintenir votre connexion. Expire après 7 jours ou à la déconnexion.</li>
+    </ul>
+    <p>Pas de cookies de tracking, pas de cookies publicitaires, pas de cookies tiers.</p>
+
+    <h3>Analytics et tracking</h3>
+    <p><strong>Aucun.</strong></p>
+    <p>Pas de Google Analytics, pas de Facebook Pixel, pas de suivi comportemental. Nous ne savons pas comment vous utilisez le site, et c'est voulu.</p>
+
+    <h3>Bases légales (GDPR)</h3>
+    <p>Conformément au RGPD :</p>
+    <ul>
+        <li><strong>Base légale :</strong> Intérêt légitime (fournir un service de soutien par les pairs)</li>
+        <li><strong>Minimisation des données :</strong> Seules les données strictement nécessaires sont collectées</li>
+        <li><strong>Stockage :</strong> Données hébergées en Belgique</li>
+        <li><strong>Durée de conservation :</strong> Tant que votre compte existe</li>
+    </ul>
+
+    <h3>Vos droits</h3>
+    <p>Vous avez le droit de :</p>
+    <ul>
+        <li><strong>Accès :</strong> Voir tous vos messages</li>
+        <li><strong>Suppression :</strong> Supprimer votre compte et tous vos messages</li>
+        <li><strong>Portabilité :</strong> Exporter vos données en JSON</li>
+    </ul>
+    <p><em>Note : Pas de "droit à la rectification" du pseudo, car cela compromettrait la sécurité.</em></p>
+
+    <h3>Sécurité</h3>
+    <p>Mesures de sécurité en place :</p>
+    <ul>
+        <li>🔒 HTTPS obligatoire (TLS 1.3)</li>
+        <li>🔒 Code PIN chiffré avec Argon2id (64MB memory cost)</li>
+        <li>🔒 Sessions stockées dans Redis avec expiration</li>
+        <li>🔒 Headers de sécurité (CSP, HSTS, etc.)</li>
+        <li>🔒 Protection contre les injections SQL</li>
+        <li>🔒 Protection contre les attaques XSS</li>
+        <li>🔒 Rate limiting pour prévenir les abus</li>
+    </ul>
+
+    <h3>Partage de données</h3>
+    <p><strong>Nous ne partageons AUCUNE donnée avec des tiers.</strong></p>
+    <p>Pas de régie publicitaire, pas de partenaires commerciaux, pas de vente de données.</p>
+
+    <h3>Autorités légales</h3>
+    <p>En cas de demande légitime des autorités belges :</p>
+    <ul>
+        <li>Nous ne pouvons fournir QUE : pseudo, messages publics, dates de création</li>
+        <li>Nous ne pouvons PAS fournir : adresse IP (nous ne les stockons pas), identité réelle (nous ne la connaissons pas)</li>
+    </ul>
+
+    <h3>Modifications de cette politique</h3>
+    <p>Nous vous informerons de toute modification importante via une bannière sur le site.</p>
+
+    <h3>Contact</h3>
+    <p>Pour toute question sur cette politique : Voir la page <a href="/about">À propos</a></p>
+
+    <hr style="margin: 2rem 0;">
+
+    <p style="font-style: italic; color: #7f8c8d;">
+        Cette politique de confidentialité reflète notre engagement envers votre anonymat.
+        Nous croyons que la vie privée est un droit fondamental, pas un privilège.
+    </p>
+</div>
+
+<%- include('../partials/footer') %>

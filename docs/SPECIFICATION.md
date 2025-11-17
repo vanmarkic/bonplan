@@ -78,16 +78,14 @@ Salt: Per-user random (32 bytes)
 
 #### Brute Force Protection
 ```
-After 3 failed attempts: 1-minute lockout
-After 5 failed attempts: 5-minute lockout
-After 10 failed attempts: 30-minute lockout
-After 20 failed attempts: 24-hour lockout
+After 5 failed attempts: 30-minute lockout
 ```
 
 **Implementation:**
 - Track attempts by pseudo only (not IP - preserves anonymity)
-- Store in Redis with TTL matching lockout duration
-- Clear on successful login
+- Store in Redis with TTL of 30 minutes
+- Clear counter on successful login
+- Simple, predictable behavior for users
 
 ### 1.3 Session Management
 

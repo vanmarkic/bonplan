@@ -98,12 +98,8 @@ module.exports = {
 
     // Lockout policy
     lockout: {
-      maxAttempts: {
-        3: 60,        // 3 attempts = 1 minute
-        5: 300,       // 5 attempts = 5 minutes
-        10: 1800,     // 10 attempts = 30 minutes
-        20: 86400     // 20 attempts = 24 hours
-      }
+      maxAttempts: 5,
+      lockoutDuration: 1800  // 30 minutes in seconds
     },
 
     // Username (pseudo) validation

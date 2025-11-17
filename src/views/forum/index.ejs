@@ -1,0 +1,44 @@
+<%- include('../partials/header') %>
+
+<h2>Bienvenue au Syndicat des Tox</h2>
+
+<div class="alert alert-info" style="margin-bottom: 2rem;">
+    <p><strong>🤝 Espace de soutien par les pairs</strong></p>
+    <p>Ce forum est un espace anonyme et bienveillant pour les personnes touchées par l'addiction en Belgique. Ici, pas de jugement, que du soutien mutuel.</p>
+</div>
+
+<% if (typeof user === 'undefined' || !user) { %>
+<div style="margin-bottom: 2rem;">
+    <p>Pour participer aux discussions, vous devez créer un compte anonyme (aucun email requis).</p>
+    <a href="/auth/register" class="btn">Créer un compte anonyme</a>
+    <a href="/auth/login" class="btn btn-secondary" style="margin-left: 1rem;">Se connecter</a>
+</div>
+<% } else { %>
+<div style="margin-bottom: 2rem;">
+    <p>Connecté en tant que <strong><%= user.pseudo %></strong></p>
+</div>
+<% } %>
+
+<hr style="margin: 2rem 0; border: none; border-top: 1px solid #ccc;">
+
+<h3>Fonctionnalités à venir (Phase 1 - Semaines 5-8)</h3>
+<ul>
+    <li>✅ Système d'authentification anonyme (pseudo + PIN)</li>
+    <li>✅ Gestion de session sécurisée</li>
+    <li>⏳ Création et lecture de fils de discussion</li>
+    <li>⏳ Réponses aux discussions</li>
+    <li>⏳ Système de modération communautaire</li>
+    <li>⏳ Recherche dans les discussions</li>
+</ul>
+
+<div class="alert alert-info" style="margin-top: 2rem;">
+    <p><strong>🔒 Votre vie privée :</strong></p>
+    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+        <li>Aucune adresse IP n'est enregistrée</li>
+        <li>Aucun cookie de suivi</li>
+        <li>Aucune donnée personnelle collectée</li>
+        <li>Tout est anonyme et chiffré</li>
+    </ul>
+</div>
+
+<%- include('../partials/footer') %>

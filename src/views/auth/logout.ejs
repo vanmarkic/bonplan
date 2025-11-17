@@ -1,0 +1,12 @@
+<%- include('../partials/header') %>
+
+<h2>Déconnexion</h2>
+
+<p>Êtes-vous sûr de vouloir vous déconnecter ?</p>
+
+<form method="POST" action="/auth/logout" style="margin-top: 1.5rem;">
+    <button type="submit" class="btn">Oui, me déconnecter</button>
+    <a href="/" class="btn btn-secondary" style="margin-left: 1rem;">Annuler</a>
+</form>
+
+<%- include('../partials/footer') %>
